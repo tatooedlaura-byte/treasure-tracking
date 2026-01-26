@@ -28,7 +28,7 @@ export function LandingPage() {
       <div className="landing-content">
         {/* App Icon */}
         <div className="landing-icon-wrapper">
-          <img src="/treasure-icon.png" alt="Treasure Tracking" className="landing-icon" />
+          <img src={`${import.meta.env.BASE_URL}treasure-icon.png`} alt="Treasure Tracking" className="landing-icon" />
         </div>
 
         {/* Title */}

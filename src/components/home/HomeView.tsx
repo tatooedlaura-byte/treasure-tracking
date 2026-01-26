@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, Icon, Button, LoadingSpinner } from '../common';
+import { Card, Icon, Button } from '../common';
 import { StatBubble } from './StatBubble';
 import { CollectionTile } from './CollectionTile';
 import { ActionButton } from './ActionButton';
@@ -12,13 +12,12 @@ import { HelpView } from '../settings/HelpView';
 import { useCollections } from '../../hooks/useCollections';
 import type { ItemCollection } from '../../types';
 
-// App icon as base64 (placeholder - you can replace with actual icon)
-const APP_ICON = '/treasure-icon.png';
+// App icon path - use import.meta.env.BASE_URL for correct path
+const APP_ICON = `${import.meta.env.BASE_URL}treasure-icon.png`;
 
 export function HomeView() {
   const {
     collections,
-    loading,
     totalItems,
     totalEstimatedValue,
     itemCount,
@@ -30,10 +29,6 @@ export function HomeView() {
   const [showExport, setShowExport] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [selectedCollection, setSelectedCollection] = useState<ItemCollection | null>(null);
-
-  if (loading) {
-    return <LoadingSpinner fullScreen />;
-  }
 
   // Show collection detail if selected
   if (selectedCollection) {
