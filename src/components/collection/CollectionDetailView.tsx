@@ -98,6 +98,9 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
   // Group items by first letter when sorted by name and has enough items
   const showAlphabetIndex = sortBy === 'name' && filteredItems.length > 10 && !searchQuery;
 
+  // Debug
+  console.log('[AlphabetIndex]', { sortBy, count: filteredItems.length, searchQuery, showAlphabetIndex });
+
   const groupedItems = useMemo(() => {
     if (!showAlphabetIndex) return null;
 
@@ -550,23 +553,19 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
 
         .alphabet-index {
           position: fixed;
-          right: 4px;
+          right: 8px;
           top: 50%;
           transform: translateY(-50%);
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 1px;
-          z-index: 50;
-          background: rgba(255, 255, 255, 0.9);
-          border-radius: 10px;
-          padding: 4px 2px;
-        }
-
-        @media (prefers-color-scheme: dark) {
-          .alphabet-index {
-            background: rgba(30, 36, 41, 0.9);
-          }
+          gap: 2px;
+          z-index: 999;
+          background: var(--color-card);
+          border-radius: 12px;
+          padding: 6px 4px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+          border: 1px solid var(--color-border);
         }
 
         .index-letter {
