@@ -40,8 +40,11 @@ export default defineConfig({
         ]
       },
       workbox: {
-        cacheId: 'treasure-tracking-v1',
+        cacheId: 'treasure-tracking-v2',
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/www\.googleapis\.com\/.*/i,

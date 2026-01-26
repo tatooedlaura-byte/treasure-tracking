@@ -98,9 +98,6 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
   // Group items by first letter when sorted by name and has enough items
   const showAlphabetIndex = sortBy === 'name' && filteredItems.length > 10 && !searchQuery;
 
-  // Debug
-  console.log('[AlphabetIndex]', { sortBy, count: filteredItems.length, searchQuery, showAlphabetIndex });
-
   const groupedItems = useMemo(() => {
     if (!showAlphabetIndex) return null;
 
