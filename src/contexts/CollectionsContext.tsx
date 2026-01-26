@@ -224,6 +224,9 @@ export function CollectionsProvider({ children }: { children: ReactNode }) {
     async (item: CollectionItem, newPhotoFiles?: File[]): Promise<void> => {
       const storage = getGoogleDriveProvider();
 
+      // Create a copy to avoid mutating the original
+      let updatedItem = { ...item };
+
       // Upload new photos if any
       if (newPhotoFiles && newPhotoFiles.length > 0) {
         const newPhotos: PhotoAttachment[] = [];
@@ -231,10 +234,10 @@ export function CollectionsProvider({ children }: { children: ReactNode }) {
           const photo = await storage.uploadPhoto(file);
           newPhotos.push(photo);
         }
-        item.photos = [...item.photos, ...newPhotos];
+        updatedItem = { ...updatedItem, photos: [...item.photos, ...newPhotos] };
       }
 
-      await storage.updateItem(item);
+      await storage.updateItem(updatedItem);
     },
     []
   );

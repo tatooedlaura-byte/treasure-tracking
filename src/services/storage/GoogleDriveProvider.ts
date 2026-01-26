@@ -435,10 +435,10 @@ export class GoogleDriveProvider implements StorageProvider {
   subscribeToChanges(callback: (data: AppData) => void): () => void {
     this.changeListeners.add(callback);
 
-    // Immediately notify with current data
+    // Immediately notify with current data (new array references for React)
     callback({
-      collections: this.collections,
-      items: this.items,
+      collections: [...this.collections],
+      items: [...this.items],
       lastModified: new Date().toISOString(),
     });
 
@@ -470,9 +470,10 @@ export class GoogleDriveProvider implements StorageProvider {
   // MARK: - Private Helpers
 
   private notifyListeners(): void {
+    // Create new array references so React detects the change
     const data: AppData = {
-      collections: this.collections,
-      items: this.items,
+      collections: [...this.collections],
+      items: [...this.items],
       lastModified: new Date().toISOString(),
     };
 

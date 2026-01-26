@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Button, Card, Icon } from '../common';
+import { Button, Card, Icon, AuthenticatedImage } from '../common';
 import { FieldEditor } from './FieldEditor';
 import { MovieSearch } from './MovieSearch';
 import { useCollections } from '../../hooks/useCollections';
@@ -64,7 +64,7 @@ export function AddItemForm({
 
   // Auto-fetch movie poster when Name field is filled for DVD collections
   const autoFetchMoviePoster = useCallback(async (movieName: string) => {
-    if (!isDVDCollection || !tmdbConfigured || !movieName.trim() || posterFetched || photoFiles.length > 0) {
+    if (!isDVDCollection || !tmdbConfigured || !movieName.trim()) {
       return;
     }
 
@@ -75,12 +75,14 @@ export function AddItemForm({
         const movie = results[0];
         const posterUrl = getPosterUrl(movie.poster_path, 'w500');
 
-        // Auto-fill year if empty
-        if (!fieldValues['Year'] && movie.release_date) {
-          setFieldValues((prev) => ({
-            ...prev,
-            Year: movie.release_date.split('-')[0],
-          }));
+        // Auto-fill year if empty (use functional update to avoid stale state)
+        if (movie.release_date) {
+          setFieldValues((prev) => {
+            if (!prev['Year']) {
+              return { ...prev, Year: movie.release_date.split('-')[0] };
+            }
+            return prev;
+          });
         }
 
         // Fetch and set poster
@@ -90,7 +92,7 @@ export function AddItemForm({
           const file = new File([blob], `${movie.title.replace(/[^a-z0-9]/gi, '_')}_poster.jpg`, {
             type: 'image/jpeg',
           });
-          setPhotoFiles([file]);
+          setPhotoFiles((prev) => prev.length === 0 ? [file] : prev);
           setPosterFetched(true);
         }
       }
@@ -99,19 +101,23 @@ export function AddItemForm({
     } finally {
       setFetchingPoster(false);
     }
-  }, [isDVDCollection, tmdbConfigured, posterFetched, photoFiles.length, fieldValues]);
+  }, [isDVDCollection, tmdbConfigured]);
 
   const handleFieldChange = (fieldName: string, value: string) => {
     setFieldValues((prev) => ({ ...prev, [fieldName]: value }));
+  };
 
-    // Reset poster fetched state if name changes
-    if (fieldName === 'Name' && isDVDCollection) {
+  // Reset poster fetched when name changes (so auto-fetch can work again on blur)
+  const handleNameChange = (value: string) => {
+    if (posterFetched) {
       setPosterFetched(false);
     }
+    setFieldValues((prev) => ({ ...prev, Name: value }));
   };
 
   const handleNameBlur = () => {
-    if (isDVDCollection && fieldValues['Name']) {
+    // Only auto-fetch if we haven't already and there are no photos
+    if (isDVDCollection && fieldValues['Name'] && !posterFetched && photoFiles.length === 0) {
       autoFetchMoviePoster(fieldValues['Name']);
     }
   };
@@ -191,7 +197,9 @@ export function AddItemForm({
               <FieldEditor
                 field={field}
                 value={fieldValues[field.name] || ''}
-                onChange={(value) => handleFieldChange(field.name, value)}
+                onChange={field.name === 'Name' && isDVDCollection
+                  ? handleNameChange
+                  : (value) => handleFieldChange(field.name, value)}
                 onBlur={field.name === 'Name' && isDVDCollection ? handleNameBlur : undefined}
               />
               {field.name === 'Name' && isDVDCollection && fetchingPoster && (
@@ -212,7 +220,7 @@ export function AddItemForm({
               <div className="photo-grid">
                 {existingItem.photos.map((photo) => (
                   <div key={photo.id} className="photo-thumb">
-                    <img src={photo.url} alt="" />
+                    <AuthenticatedImage src={photo.url} alt="" />
                   </div>
                 ))}
               </div>

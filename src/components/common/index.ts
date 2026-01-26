@@ -4,3 +4,4 @@ export { Modal } from './Modal';
 export { Icon } from './Icon';
 export { LoadingSpinner } from './LoadingSpinner';
 export { ConditionBadge } from './ConditionBadge';
+export { AuthenticatedImage } from './AuthenticatedImage';

@@ -1,8 +1,10 @@
-import { useState } from 'react';
-import { Card, Icon, ConditionBadge } from '../common';
+import { useState, useRef } from 'react';
+import { Card, Icon, ConditionBadge, AuthenticatedImage } from '../common';
 import { AddItemForm } from './AddItemForm';
+import { MovieSearch } from './MovieSearch';
 import { useCollections } from '../../hooks/useCollections';
 import { getItemName, getItemCondition } from '../../types';
+import { isTMDBConfigured, type MovieSearchResult } from '../../services/movieApi';
 import { Share } from '@capacitor/share';
 import type { ItemCollection, CollectionItem, FieldDefinition } from '../../types';
 
@@ -19,7 +21,7 @@ export function ItemDetailView({
   fields,
   onBack,
 }: ItemDetailViewProps) {
-  const { getItem, deleteItem, removePhotoFromItem } = useCollections();
+  const { getItem, deleteItem, removePhotoFromItem, addPhotosToItem } = useCollections();
 
   // Get fresh item data
   const item = getItem(initialItem.id) || initialItem;
@@ -28,9 +30,14 @@ export function ItemDetailView({
   const [showMenu, setShowMenu] = useState(false);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
   const [showFullScreenPhoto, setShowFullScreenPhoto] = useState(false);
+  const [showMovieSearch, setShowMovieSearch] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const name = getItemName(item);
   const condition = getItemCondition(item);
+  const isDVDCollection = collection.type === 'dvds';
+  const tmdbConfigured = isTMDBConfigured();
 
   const handleDelete = async () => {
     if (confirm(`Delete "${name}"?`)) {
@@ -75,6 +82,47 @@ export function ItemDetailView({
     }
   };
 
+  const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploadingPhoto(true);
+    try {
+      await addPhotosToItem(item.id, Array.from(files));
+    } catch (err) {
+      console.error('Failed to add photo:', err);
+    } finally {
+      setUploadingPhoto(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleMovieSelect = async (movie: MovieSearchResult, moviePosterUrl: string | null) => {
+    if (!moviePosterUrl) {
+      setShowMovieSearch(false);
+      return;
+    }
+
+    setShowMovieSearch(false);
+    setUploadingPhoto(true);
+
+    try {
+      const response = await fetch(moviePosterUrl);
+      const blob = await response.blob();
+      const file = new File([blob], `${movie.title.replace(/[^a-z0-9]/gi, '_')}_poster.jpg`, {
+        type: 'image/jpeg',
+      });
+      await addPhotosToItem(item.id, [file]);
+    } catch (err) {
+      console.error('Failed to fetch poster:', err);
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
   // Show edit form
   if (showEdit) {
     return (
@@ -107,7 +155,7 @@ export function ItemDetailView({
           </button>
         </header>
 
-        <img
+        <AuthenticatedImage
           src={item.photos[selectedPhotoIndex].url}
           alt=""
           className="fullscreen-img"
@@ -225,26 +273,64 @@ export function ItemDetailView({
           </div>
         </header>
 
+        {/* Movie Search Modal */}
+        {showMovieSearch && (
+          <MovieSearch
+            onSelect={handleMovieSelect}
+            onClose={() => setShowMovieSearch(false)}
+          />
+        )}
+
         {/* Photos */}
         {item.photos.length > 0 && (
           <div className="photo-carousel">
             <div className="photo-track">
               {item.photos.map((photo, index) => (
-                <img
+                <div
                   key={photo.id}
-                  src={photo.url}
-                  alt=""
-                  className="carousel-photo"
+                  className="carousel-photo-wrapper"
                   onClick={() => {
                     setSelectedPhotoIndex(index);
                     setShowFullScreenPhoto(true);
                   }}
-                />
+                >
+                  <AuthenticatedImage
+                    src={photo.url}
+                    alt=""
+                    className="carousel-photo"
+                  />
+                </div>
               ))}
             </div>
-            <p className="photo-hint caption">Tap photo to view full screen</p>
+            <p className="photo-hint caption">Tap photo to view full screen • Tap trash to delete</p>
           </div>
         )}
+
+        {/* Add Photo Options */}
+        <div className="photo-actions">
+          {isDVDCollection && tmdbConfigured && (
+            <button
+              className="photo-action-btn"
+              onClick={() => setShowMovieSearch(true)}
+              disabled={uploadingPhoto}
+            >
+              <Icon name="search" size={20} />
+              Search Movie Poster
+            </button>
+          )}
+          <label className="photo-action-btn">
+            <Icon name="camera" size={20} />
+            {uploadingPhoto ? 'Uploading...' : 'Add Photo'}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handlePhotoSelect}
+              disabled={uploadingPhoto}
+              style={{ display: 'none' }}
+            />
+          </label>
+        </div>
 
         {/* Fields */}
         <Card className="item-fields">
@@ -342,20 +428,60 @@ export function ItemDetailView({
           padding-bottom: var(--spacing-sm);
         }
 
-        .carousel-photo {
+        .carousel-photo-wrapper {
           flex: 0 0 auto;
           width: 100%;
           max-width: 300px;
           height: 200px;
-          object-fit: cover;
           border-radius: var(--radius-lg);
           scroll-snap-align: center;
           cursor: pointer;
+          overflow: hidden;
+          background: var(--color-background);
+        }
+
+        .carousel-photo {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
         }
 
         .photo-hint {
           text-align: center;
           margin-top: var(--spacing-xs);
+        }
+
+        .photo-actions {
+          display: flex;
+          gap: var(--spacing-sm);
+          margin-bottom: var(--spacing-lg);
+        }
+
+        .photo-action-btn {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: var(--spacing-sm);
+          padding: var(--spacing-md);
+          background: var(--color-card);
+          border: 2px dashed var(--color-text-secondary);
+          border-radius: var(--radius-md);
+          color: var(--color-text-secondary);
+          font-size: var(--font-sm);
+          font-weight: 600;
+          cursor: pointer;
+          transition: all var(--transition-fast);
+        }
+
+        .photo-action-btn:hover:not(:disabled) {
+          border-color: var(--color-accent);
+          color: var(--color-accent);
+        }
+
+        .photo-action-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
         }
 
         .item-fields {

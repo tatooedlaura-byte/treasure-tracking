@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { Card, Icon, Button } from '../common';
 import { ItemCard } from './ItemCard';
 import { AddItemForm } from '../item/AddItemForm';
@@ -7,6 +7,7 @@ import { EditCollectionForm } from './EditCollectionForm';
 import { useCollections } from '../../hooks/useCollections';
 import { getCollectionTypeInfo, getCollectionFields } from '../../data/collectionTypes';
 import { getItemName, getItemEstimatedValue, getItemCondition } from '../../types';
+import { searchMovies, getPosterUrl, isTMDBConfigured } from '../../services/movieApi';
 import type { ItemCollection, CollectionItem } from '../../types';
 
 interface CollectionDetailViewProps {
@@ -18,7 +19,7 @@ interface CollectionDetailViewProps {
 type SortOption = 'name' | 'date' | 'condition' | 'value';
 
 export function CollectionDetailView({ collection, onBack, onHome }: CollectionDetailViewProps) {
-  const { getItemsForCollection, deleteCollection, collectionValue } = useCollections();
+  const { getItemsForCollection, deleteCollection, collectionValue, updateItem } = useCollections();
 
   const [showAddItem, setShowAddItem] = useState(false);
   const [showEditCollection, setShowEditCollection] = useState(false);
@@ -26,9 +27,15 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('name');
   const [showMenu, setShowMenu] = useState(false);
+  const [fetchingPosters, setFetchingPosters] = useState(false);
+  const [fetchProgress, setFetchProgress] = useState({ current: 0, total: 0, currentTitle: '' });
+  const [savedScrollPosition, setSavedScrollPosition] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const isDVDCollection = collection.type === 'dvds';
+  const tmdbConfigured = isTMDBConfigured();
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -43,6 +50,16 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showMenu]);
+
+  // Restore scroll position when returning from item detail
+  useEffect(() => {
+    if (!selectedItem && !showAddItem && !showEditCollection && savedScrollPosition > 0) {
+      // Use setTimeout to ensure the DOM has rendered
+      setTimeout(() => {
+        window.scrollTo(0, savedScrollPosition);
+      }, 0);
+    }
+  }, [selectedItem, showAddItem, showEditCollection, savedScrollPosition]);
 
   const typeInfo = getCollectionTypeInfo(collection.type);
   const fields = getCollectionFields(collection.type, collection.customFields);
@@ -134,11 +151,65 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
     }
   };
 
+  // Items without photos
+  const itemsWithoutPhotos = useMemo(() => {
+    return items.filter(item => item.photos.length === 0);
+  }, [items]);
+
+  // Fetch missing posters for DVD collections
+  const fetchMissingPosters = useCallback(async () => {
+    if (!isDVDCollection || !tmdbConfigured || itemsWithoutPhotos.length === 0) return;
+
+    setFetchingPosters(true);
+    setFetchProgress({ current: 0, total: itemsWithoutPhotos.length, currentTitle: '' });
+
+    for (let i = 0; i < itemsWithoutPhotos.length; i++) {
+      const item = itemsWithoutPhotos[i];
+      const movieName = getItemName(item);
+
+      setFetchProgress({ current: i + 1, total: itemsWithoutPhotos.length, currentTitle: movieName });
+
+      try {
+        const results = await searchMovies(movieName);
+        if (results.length > 0) {
+          const movie = results[0];
+          const posterUrl = getPosterUrl(movie.poster_path, 'w500');
+
+          if (posterUrl) {
+            // Fetch poster image
+            const response = await fetch(posterUrl);
+            const blob = await response.blob();
+            const file = new File([blob], `${movie.title.replace(/[^a-z0-9]/gi, '_')}_poster.jpg`, {
+              type: 'image/jpeg',
+            });
+
+            // Update item with poster
+            await updateItem(item, [file]);
+          }
+        }
+      } catch (err) {
+        console.error(`Failed to fetch poster for "${movieName}":`, err);
+      }
+
+      // Small delay to avoid rate limiting
+      await new Promise(resolve => setTimeout(resolve, 300));
+    }
+
+    setFetchingPosters(false);
+    setFetchProgress({ current: 0, total: 0, currentTitle: '' });
+  }, [isDVDCollection, tmdbConfigured, itemsWithoutPhotos, updateItem]);
+
   const handleDeleteCollection = async () => {
     if (confirm(`Delete "${collection.name}" and all its items?`)) {
       await deleteCollection(collection.id);
       onBack();
     }
+  };
+
+  const handleSelectItem = (item: CollectionItem) => {
+    // Save current scroll position before navigating to item detail
+    setSavedScrollPosition(window.scrollY);
+    setSelectedItem(item);
   };
 
   // Show edit collection form
@@ -233,6 +304,39 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
           </div>
         </Card>
 
+        {/* Fetch Missing Posters for DVDs */}
+        {isDVDCollection && tmdbConfigured && itemsWithoutPhotos.length > 0 && !fetchingPosters && (
+          <Card className="fetch-posters-card" onClick={fetchMissingPosters}>
+            <div className="fetch-posters-content">
+              <Icon name="image" size={24} color="var(--color-dvds)" />
+              <div>
+                <h3>Fetch Missing Posters</h3>
+                <p>{itemsWithoutPhotos.length} movie{itemsWithoutPhotos.length !== 1 ? 's' : ''} without cover art</p>
+              </div>
+            </div>
+            <Icon name="chevron-right" size={20} color="var(--color-text-secondary)" />
+          </Card>
+        )}
+
+        {/* Fetching Progress */}
+        {fetchingPosters && (
+          <Card className="fetch-progress-card">
+            <div className="fetch-progress-content">
+              <div className="spinner small" />
+              <div>
+                <h3>Fetching Posters...</h3>
+                <p>{fetchProgress.current} of {fetchProgress.total}: {fetchProgress.currentTitle}</p>
+              </div>
+            </div>
+            <div className="progress-bar">
+              <div
+                className="progress-fill"
+                style={{ width: `${(fetchProgress.current / fetchProgress.total) * 100}%` }}
+              />
+            </div>
+          </Card>
+        )}
+
         {/* Search */}
         {items.length > 0 && (
           <div className={`search-input-wrapper ${showAlphabetIndex ? 'with-index' : ''}`}>
@@ -299,7 +403,7 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
                       key={item.id}
                       item={item}
                       fields={fields}
-                      onClick={() => setSelectedItem(item)}
+                      onClick={() => handleSelectItem(item)}
                     />
                   ))}
                 </div>
@@ -324,7 +428,7 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
                 key={item.id}
                 item={item}
                 fields={fields}
-                onClick={() => setSelectedItem(item)}
+                onClick={() => handleSelectItem(item)}
               />
             ))}
           </div>
@@ -440,6 +544,84 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
         .stats-value {
           font-size: var(--font-sm);
           color: var(--color-text-secondary);
+        }
+
+        .fetch-posters-card {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: var(--spacing-lg);
+          margin-bottom: var(--spacing-md);
+          cursor: pointer;
+          background: linear-gradient(135deg, rgba(92, 77, 115, 0.1), rgba(92, 77, 115, 0.05));
+          border: 2px solid rgba(92, 77, 115, 0.3);
+        }
+
+        .fetch-posters-card:hover {
+          border-color: rgba(92, 77, 115, 0.5);
+          background: linear-gradient(135deg, rgba(92, 77, 115, 0.15), rgba(92, 77, 115, 0.08));
+        }
+
+        .fetch-posters-content {
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-md);
+        }
+
+        .fetch-posters-content h3,
+        .fetch-progress-content h3 {
+          font-size: var(--font-md);
+          font-weight: 600;
+          color: var(--color-text);
+          margin-bottom: 2px;
+        }
+
+        .fetch-posters-content p,
+        .fetch-progress-content p {
+          font-size: var(--font-sm);
+          color: var(--color-text-secondary);
+        }
+
+        .fetch-progress-card {
+          padding: var(--spacing-lg);
+          margin-bottom: var(--spacing-md);
+          background: linear-gradient(135deg, rgba(92, 77, 115, 0.1), rgba(92, 77, 115, 0.05));
+          border: 2px solid rgba(92, 77, 115, 0.3);
+        }
+
+        .fetch-progress-content {
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-md);
+          margin-bottom: var(--spacing-md);
+        }
+
+        .progress-bar {
+          width: 100%;
+          height: 8px;
+          background: rgba(92, 77, 115, 0.2);
+          border-radius: 4px;
+          overflow: hidden;
+        }
+
+        .progress-fill {
+          height: 100%;
+          background: var(--color-dvds);
+          border-radius: 4px;
+          transition: width 0.3s ease;
+        }
+
+        .spinner.small {
+          width: 24px;
+          height: 24px;
+          border: 3px solid rgba(92, 77, 115, 0.2);
+          border-top-color: var(--color-dvds);
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          to { transform: rotate(360deg); }
         }
 
         .search-input-wrapper {

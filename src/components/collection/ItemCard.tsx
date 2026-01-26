@@ -1,4 +1,4 @@
-import { Card, Icon, ConditionBadge } from '../common';
+import { Card, Icon, ConditionBadge, AuthenticatedImage } from '../common';
 import { getItemName, getItemEstimatedValue, getItemCondition } from '../../types';
 import type { CollectionItem, FieldDefinition } from '../../types';
 
@@ -29,7 +29,12 @@ export function ItemCard({ item, fields, onClick }: ItemCardProps) {
       {/* Thumbnail */}
       <div className="item-thumb">
         {hasPhotos ? (
-          <img src={item.photos[0].url} alt={name} className="item-thumb-img" />
+          <AuthenticatedImage
+            src={item.photos[0].url}
+            alt={name}
+            className="item-thumb-img"
+            fallback={<Icon name="image" size={24} color="var(--color-text-secondary)" />}
+          />
         ) : (
           <Icon name="image" size={24} color="var(--color-text-secondary)" />
         )}
