@@ -235,7 +235,7 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
 
         {/* Search */}
         {items.length > 0 && (
-          <div className="search-input-wrapper">
+          <div className={`search-input-wrapper ${showAlphabetIndex ? 'with-index' : ''}`}>
             <Icon name="search" size={18} />
             <input
               type="text"
@@ -249,7 +249,7 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
 
         {/* Sort Bar */}
         {items.length > 0 && (
-          <div className="sort-bar">
+          <div className={`sort-bar ${showAlphabetIndex ? 'with-index' : ''}`}>
             <div className="sort-controls">
               <span className="sort-label">Sort:</span>
               <select
@@ -453,6 +453,10 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
           margin-bottom: var(--spacing-sm);
         }
 
+        .search-input-wrapper.with-index {
+          margin-right: 28px;
+        }
+
         .search-input-wrapper svg {
           color: var(--color-text-secondary);
         }
@@ -477,15 +481,21 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
           margin-bottom: var(--spacing-sm);
         }
 
+        .sort-bar.with-index {
+          margin-right: 28px;
+        }
+
         .sort-controls {
           display: flex;
           align-items: center;
           gap: var(--spacing-sm);
+          min-width: 0;
         }
 
         .sort-label {
           font-size: var(--font-sm);
           color: var(--color-text-secondary);
+          flex-shrink: 0;
         }
 
         .sort-select {
@@ -501,6 +511,7 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
         .items-count {
           font-size: var(--font-sm);
           color: var(--color-text-secondary);
+          flex-shrink: 0;
         }
 
         .items-list {
