@@ -50,9 +50,11 @@ export function SettingsView({ onClose }: SettingsViewProps) {
                   color={mode === opt.value ? 'var(--color-accent)' : 'var(--color-text-secondary)'}
                 />
                 <span>{opt.label}</span>
-                {mode === opt.value && (
-                  <Icon name="check" size={18} color="var(--color-accent)" />
-                )}
+                <div className="check-placeholder">
+                  {mode === opt.value && (
+                    <Icon name="check" size={18} color="var(--color-accent)" />
+                  )}
+                </div>
               </button>
             ))}
           </div>
@@ -152,6 +154,14 @@ export function SettingsView({ onClose }: SettingsViewProps) {
 
         .appearance-option.selected {
           background: rgba(51, 166, 140, 0.1);
+        }
+
+        .check-placeholder {
+          width: 18px;
+          height: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .account-info {

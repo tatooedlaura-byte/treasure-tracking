@@ -7,7 +7,7 @@ import { AddCollectionForm } from '../collection/AddCollectionForm';
 import { CollectionDetailView } from '../collection/CollectionDetailView';
 import { SettingsView } from '../settings/SettingsView';
 import { GlobalSearchView } from '../search/GlobalSearchView';
-import { ExportView } from '../import-export/ExportView';
+import { ExportView, CSVImportView } from '../import-export';
 import { HelpView } from '../settings/HelpView';
 import { useCollections } from '../../hooks/useCollections';
 import type { ItemCollection } from '../../types';
@@ -27,6 +27,7 @@ export function HomeView() {
   const [showSettings, setShowSettings] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [showExport, setShowExport] = useState(false);
+  const [showCSVImport, setShowCSVImport] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [selectedCollection, setSelectedCollection] = useState<ItemCollection | null>(null);
 
@@ -36,6 +37,7 @@ export function HomeView() {
       <CollectionDetailView
         collection={selectedCollection}
         onBack={() => setSelectedCollection(null)}
+        onHome={() => setSelectedCollection(null)}
       />
     );
   }
@@ -59,7 +61,19 @@ export function HomeView() {
   }
 
   if (showExport) {
-    return <ExportView onClose={() => setShowExport(false)} />;
+    return (
+      <ExportView
+        onClose={() => setShowExport(false)}
+        onCSVImport={() => {
+          setShowExport(false);
+          setShowCSVImport(true);
+        }}
+      />
+    );
+  }
+
+  if (showCSVImport) {
+    return <CSVImportView onClose={() => setShowCSVImport(false)} />;
   }
 
   if (showHelp) {

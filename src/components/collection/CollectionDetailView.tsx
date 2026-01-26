@@ -1,8 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Card, Icon, Button } from '../common';
 import { ItemCard } from './ItemCard';
 import { AddItemForm } from '../item/AddItemForm';
 import { ItemDetailView } from '../item/ItemDetailView';
+import { EditCollectionForm } from './EditCollectionForm';
 import { useCollections } from '../../hooks/useCollections';
 import { getCollectionTypeInfo, getCollectionFields } from '../../data/collectionTypes';
 import { getItemName, getItemEstimatedValue, getItemCondition } from '../../types';
@@ -11,18 +12,35 @@ import type { ItemCollection, CollectionItem } from '../../types';
 interface CollectionDetailViewProps {
   collection: ItemCollection;
   onBack: () => void;
+  onHome?: () => void;
 }
 
 type SortOption = 'name' | 'date' | 'condition' | 'value';
 
-export function CollectionDetailView({ collection, onBack }: CollectionDetailViewProps) {
+export function CollectionDetailView({ collection, onBack, onHome }: CollectionDetailViewProps) {
   const { getItemsForCollection, deleteCollection, collectionValue } = useCollections();
 
   const [showAddItem, setShowAddItem] = useState(false);
+  const [showEditCollection, setShowEditCollection] = useState(false);
   const [selectedItem, setSelectedItem] = useState<CollectionItem | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('date');
   const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    if (!showMenu) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showMenu]);
 
   const typeInfo = getCollectionTypeInfo(collection.type);
   const fields = getCollectionFields(collection.type, collection.customFields);
@@ -82,6 +100,17 @@ export function CollectionDetailView({ collection, onBack }: CollectionDetailVie
     }
   };
 
+  // Show edit collection form
+  if (showEditCollection) {
+    return (
+      <EditCollectionForm
+        collection={collection}
+        onClose={() => setShowEditCollection(false)}
+        onSuccess={() => setShowEditCollection(false)}
+      />
+    );
+  }
+
   // Show add item form
   if (showAddItem) {
     return (
@@ -111,16 +140,31 @@ export function CollectionDetailView({ collection, onBack }: CollectionDetailVie
       <div className="container">
         {/* Header */}
         <header className="detail-header">
-          <button className="back-btn" onClick={onBack}>
-            <Icon name="chevron-left" size={24} />
-          </button>
+          <div className="header-left">
+            {onHome && (
+              <button className="home-btn" onClick={onHome}>
+                <Icon name="home" size={22} />
+              </button>
+            )}
+            <button className="back-btn" onClick={onBack}>
+              <Icon name="chevron-left" size={24} />
+            </button>
+          </div>
           <h1 className="heading">{collection.name}</h1>
-          <div className="header-actions">
+          <div className="header-actions" ref={menuRef}>
+            <button className="header-btn" onClick={() => setShowAddItem(true)}>
+              <Icon name="plus-circle" size={24} />
+            </button>
             <button className="header-btn" onClick={() => setShowMenu(!showMenu)}>
-              <Icon name="more-vertical" size={24} />
+              <Icon name="more-horizontal" size={24} />
             </button>
             {showMenu && (
               <div className="dropdown-menu">
+                <button onClick={() => { setShowMenu(false); setShowEditCollection(true); }} className="menu-item">
+                  <Icon name="edit" size={20} />
+                  Edit Collection
+                </button>
+                <hr className="menu-divider" />
                 <button onClick={handleDeleteCollection} className="menu-item danger">
                   <Icon name="trash" size={20} />
                   Delete Collection
@@ -148,29 +192,37 @@ export function CollectionDetailView({ collection, onBack }: CollectionDetailVie
           </div>
         </Card>
 
-        {/* Search and Sort */}
+        {/* Search */}
         {items.length > 0 && (
-          <div className="search-sort-row">
-            <div className="search-input-wrapper">
-              <Icon name="search" size={18} />
-              <input
-                type="text"
-                className="search-input"
-                placeholder="Search items..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+          <div className="search-input-wrapper">
+            <Icon name="search" size={18} />
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search items..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        )}
+
+        {/* Sort Bar */}
+        {items.length > 0 && (
+          <div className="sort-bar">
+            <div className="sort-controls">
+              <span className="sort-label">Sort:</span>
+              <select
+                className="sort-select"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortOption)}
+              >
+                <option value="date">Date Added</option>
+                <option value="name">Name</option>
+                <option value="condition">Condition</option>
+                <option value="value">Value</option>
+              </select>
             </div>
-            <select
-              className="sort-select"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as SortOption)}
-            >
-              <option value="date">Newest</option>
-              <option value="name">Name</option>
-              <option value="condition">Condition</option>
-              <option value="value">Value</option>
-            </select>
+            <span className="items-count">{filteredItems.length} items</span>
           </div>
         )}
 
@@ -221,6 +273,20 @@ export function CollectionDetailView({ collection, onBack }: CollectionDetailVie
           position: relative;
         }
 
+        .header-left {
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-xs);
+        }
+
+        .home-btn {
+          background: transparent;
+          border: none;
+          padding: var(--spacing-sm);
+          cursor: pointer;
+          color: var(--color-accent);
+        }
+
         .back-btn, .header-btn {
           background: transparent;
           border: none;
@@ -230,6 +296,8 @@ export function CollectionDetailView({ collection, onBack }: CollectionDetailVie
         }
 
         .header-actions {
+          display: flex;
+          align-items: center;
           position: relative;
         }
 
@@ -259,6 +327,12 @@ export function CollectionDetailView({ collection, onBack }: CollectionDetailVie
 
         .menu-item.danger {
           color: var(--color-error);
+        }
+
+        .menu-divider {
+          margin: 0;
+          border: none;
+          border-top: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         .collection-stats {
@@ -294,14 +368,7 @@ export function CollectionDetailView({ collection, onBack }: CollectionDetailVie
           color: var(--color-text-secondary);
         }
 
-        .search-sort-row {
-          display: flex;
-          gap: var(--spacing-sm);
-          margin-bottom: var(--spacing-md);
-        }
-
         .search-input-wrapper {
-          flex: 1;
           display: flex;
           align-items: center;
           gap: var(--spacing-sm);
@@ -309,6 +376,7 @@ export function CollectionDetailView({ collection, onBack }: CollectionDetailVie
           background: var(--color-card);
           border-radius: var(--radius-md);
           border: var(--card-border);
+          margin-bottom: var(--spacing-sm);
         }
 
         .search-input-wrapper svg {
@@ -327,13 +395,38 @@ export function CollectionDetailView({ collection, onBack }: CollectionDetailVie
           outline: none;
         }
 
-        .sort-select {
-          padding: var(--spacing-sm) var(--spacing-md);
-          background: var(--color-card);
-          border: var(--card-border);
-          border-radius: var(--radius-md);
+        .sort-bar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: var(--spacing-sm) 0;
+          margin-bottom: var(--spacing-sm);
+        }
+
+        .sort-controls {
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-sm);
+        }
+
+        .sort-label {
           font-size: var(--font-sm);
-          color: var(--color-text);
+          color: var(--color-text-secondary);
+        }
+
+        .sort-select {
+          padding: var(--spacing-xs) var(--spacing-sm);
+          background: transparent;
+          border: none;
+          font-size: var(--font-sm);
+          color: var(--color-accent);
+          font-weight: 500;
+          cursor: pointer;
+        }
+
+        .items-count {
+          font-size: var(--font-sm);
+          color: var(--color-text-secondary);
         }
 
         .items-list {

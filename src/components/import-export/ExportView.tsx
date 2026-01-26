@@ -7,9 +7,10 @@ import type { ExportData } from '../../types';
 
 interface ExportViewProps {
   onClose: () => void;
+  onCSVImport?: () => void;
 }
 
-export function ExportView({ onClose }: ExportViewProps) {
+export function ExportView({ onClose, onCSVImport }: ExportViewProps) {
   const { collections, items } = useCollections();
   const [importing, setImporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -149,9 +150,13 @@ export function ExportView({ onClose }: ExportViewProps) {
               <p className="section-desc">Bulk import items from a spreadsheet</p>
             </div>
           </div>
-          <p className="csv-note caption">
-            CSV import requires selecting a collection first. Go to a collection and use the menu to import CSV.
-          </p>
+          {onCSVImport ? (
+            <Button onClick={onCSVImport}>Import CSV</Button>
+          ) : (
+            <p className="csv-note caption">
+              CSV import requires selecting a collection first.
+            </p>
+          )}
         </Card>
 
         {/* Error */}

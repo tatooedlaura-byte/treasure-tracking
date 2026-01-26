@@ -41,7 +41,7 @@ export function ItemCard({ item, fields, onClick }: ItemCardProps) {
 
         {previewFields.length > 0 && (
           <p className="item-preview">
-            {previewFields.map((f) => f.value).join(' | ')}
+            {previewFields.map((f) => f.value).join(' • ')}
           </p>
         )}
 
@@ -66,9 +66,9 @@ export function ItemCard({ item, fields, onClick }: ItemCardProps) {
         }
 
         .item-thumb {
-          width: 56px;
-          height: 56px;
-          border-radius: var(--radius-md);
+          width: 60px;
+          height: 60px;
+          border-radius: 10px;
           background: var(--color-background);
           display: flex;
           align-items: center;
