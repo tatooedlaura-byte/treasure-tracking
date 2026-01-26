@@ -32,21 +32,41 @@ export function CollectionTile({ collection, itemCount, onClick }: CollectionTil
           padding: var(--spacing-lg);
           cursor: pointer;
           text-align: center;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .collection-tile::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 4px;
+          background: linear-gradient(90deg, ${typeInfo.color}, ${typeInfo.color}99);
+          border-radius: var(--radius-lg) var(--radius-lg) 0 0;
         }
 
         .tile-icon {
-          width: 56px;
-          height: 56px;
-          border-radius: 50%;
+          width: 64px;
+          height: 64px;
+          border-radius: 16px;
           display: flex;
           align-items: center;
           justify-content: center;
           margin-bottom: var(--spacing-md);
+          box-shadow: 0 4px 12px ${typeInfo.color}40;
+          transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+        }
+
+        .collection-tile:hover .tile-icon {
+          transform: scale(1.05);
+          box-shadow: 0 6px 16px ${typeInfo.color}50;
         }
 
         .tile-name {
           font-size: 1rem;
-          font-weight: 600;
+          font-weight: 700;
           color: var(--color-text);
           margin-bottom: var(--spacing-xs);
           white-space: nowrap;
@@ -56,8 +76,16 @@ export function CollectionTile({ collection, itemCount, onClick }: CollectionTil
         }
 
         .tile-count {
-          font-size: 0.75rem;
+          font-size: 0.8rem;
+          font-weight: 500;
           color: var(--color-text-secondary);
+          background: rgba(51, 89, 115, 0.08);
+          padding: 4px 12px;
+          border-radius: 12px;
+        }
+
+        [data-theme="dark"] .tile-count {
+          background: rgba(242, 224, 191, 0.1);
         }
       `}</style>
     </Card>
