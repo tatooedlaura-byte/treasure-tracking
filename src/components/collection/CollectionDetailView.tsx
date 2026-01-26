@@ -24,7 +24,7 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
   const [showEditCollection, setShowEditCollection] = useState(false);
   const [selectedItem, setSelectedItem] = useState<CollectionItem | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<SortOption>('date');
+  const [sortBy, setSortBy] = useState<SortOption>('name');
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
