@@ -172,9 +172,8 @@ const icons: Record<string, (props: { size: number; color: string }) => ReactNod
     </svg>
   ),
   'home': ({ size, color }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} stroke={color} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-      <polyline points="9 22 9 12 15 12 15 22" stroke="white" strokeWidth="2" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} stroke="none">
+      <path d="M12 2.1L1 12h3v9a1 1 0 001 1h5v-6a2 2 0 014 0v6h5a1 1 0 001-1v-9h3L12 2.1z" />
     </svg>
   ),
   'check-circle': ({ size, color }) => (
