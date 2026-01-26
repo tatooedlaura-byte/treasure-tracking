@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Button, Card, Icon } from '../common';
 import { FieldEditor } from './FieldEditor';
+import { MovieSearch } from './MovieSearch';
 import { useCollections } from '../../hooks/useCollections';
+import type { MovieSearchResult } from '../../services/movieApi';
 import type { ItemCollection, FieldDefinition, CollectionItem } from '../../types';
 
 interface AddItemFormProps {
@@ -28,6 +30,34 @@ export function AddItemForm({
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showMovieSearch, setShowMovieSearch] = useState(false);
+
+  const isDVDCollection = collection.type === 'dvds';
+
+  const handleMovieSelect = async (movie: MovieSearchResult, moviePosterUrl: string | null) => {
+    // Fill in fields from movie data
+    setFieldValues((prev) => ({
+      ...prev,
+      Name: movie.title,
+      Year: movie.release_date?.split('-')[0] || '',
+    }));
+
+    // Fetch the poster and convert to file for upload
+    if (moviePosterUrl) {
+      try {
+        const response = await fetch(moviePosterUrl);
+        const blob = await response.blob();
+        const file = new File([blob], `${movie.title.replace(/[^a-z0-9]/gi, '_')}_poster.jpg`, {
+          type: 'image/jpeg',
+        });
+        setPhotoFiles([file]);
+      } catch (err) {
+        console.error('Failed to fetch poster:', err);
+      }
+    }
+
+    setShowMovieSearch(false);
+  };
 
   const handleFieldChange = (fieldName: string, value: string) => {
     setFieldValues((prev) => ({ ...prev, [fieldName]: value }));
@@ -78,6 +108,28 @@ export function AddItemForm({
           <h1 className="heading">{isEditing ? 'Edit Item' : 'Add Item'}</h1>
           <div style={{ width: 40 }} />
         </header>
+
+        {/* Movie Search Button for DVDs */}
+        {isDVDCollection && !isEditing && (
+          <Card className="movie-search-card" onClick={() => setShowMovieSearch(true)}>
+            <div className="movie-search-content">
+              <Icon name="search" size={24} color="var(--color-dvds)" />
+              <div>
+                <h3>Search Movie Database</h3>
+                <p>Find movie covers and auto-fill details</p>
+              </div>
+            </div>
+            <Icon name="chevron-right" size={20} color="var(--color-text-secondary)" />
+          </Card>
+        )}
+
+        {/* Movie Search Modal */}
+        {showMovieSearch && (
+          <MovieSearch
+            onSelect={handleMovieSelect}
+            onClose={() => setShowMovieSearch(false)}
+          />
+        )}
 
         <form onSubmit={handleSubmit}>
           {/* Fields */}
@@ -240,6 +292,40 @@ export function AddItemForm({
         form .btn {
           width: 100%;
           margin-bottom: var(--spacing-lg);
+        }
+
+        .movie-search-card {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: var(--spacing-lg);
+          margin-bottom: var(--spacing-md);
+          cursor: pointer;
+          background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(139, 92, 246, 0.05));
+          border: 2px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .movie-search-card:hover {
+          border-color: rgba(139, 92, 246, 0.5);
+          background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(139, 92, 246, 0.08));
+        }
+
+        .movie-search-content {
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-md);
+        }
+
+        .movie-search-content h3 {
+          font-size: var(--font-md);
+          font-weight: 600;
+          color: var(--color-text);
+          margin-bottom: 2px;
+        }
+
+        .movie-search-content p {
+          font-size: var(--font-sm);
+          color: var(--color-text-secondary);
         }
       `}</style>
     </div>

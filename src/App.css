@@ -31,24 +31,26 @@ body {
 .adaptive-background {
   min-height: 100vh;
   background:
-    radial-gradient(ellipse at top left, rgba(51, 166, 140, 0.15) 0%, transparent 50%),
-    radial-gradient(ellipse at top right, rgba(230, 115, 102, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at top left, rgba(0, 200, 150, 0.25) 0%, transparent 40%),
+    radial-gradient(ellipse at top right, rgba(255, 90, 70, 0.15) 0%, transparent 40%),
+    radial-gradient(ellipse at bottom left, rgba(139, 92, 246, 0.1) 0%, transparent 40%),
     linear-gradient(
       to bottom,
-      rgb(102, 191, 166) 0%,
-      rgb(140, 210, 190) 15%,
-      var(--color-background) 40%
+      rgb(0, 180, 140) 0%,
+      rgb(80, 210, 175) 10%,
+      var(--color-background) 35%
     );
 }
 
 [data-theme="dark"] .adaptive-background {
   background:
-    radial-gradient(ellipse at top left, rgba(51, 166, 140, 0.1) 0%, transparent 50%),
-    radial-gradient(ellipse at top right, rgba(230, 115, 102, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at top left, rgba(0, 200, 150, 0.15) 0%, transparent 40%),
+    radial-gradient(ellipse at top right, rgba(139, 92, 246, 0.12) 0%, transparent 40%),
+    radial-gradient(ellipse at bottom, rgba(255, 90, 70, 0.08) 0%, transparent 40%),
     linear-gradient(
       to bottom,
-      rgb(30, 40, 48) 0%,
-      var(--color-background) 30%
+      rgb(20, 35, 45) 0%,
+      var(--color-background) 25%
     );
 }
 

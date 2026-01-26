@@ -16,17 +16,17 @@ function field(
   };
 }
 
-// Collection type colors (from iOS Theme.swift)
+// Collection type colors - VIBRANT & SATURATED
 export const COLLECTION_COLORS: Record<CollectionType, string> = {
-  currency: '#D9A633', // Rich gold
-  stamps: '#E67366',   // Strong coral
-  cards: '#33A68C',    // Vibrant teal
-  dvds: '#335973',     // Deep slate
-  vinyl: '#263340',    // Dark slate
-  books: '#4D8CA6',    // Stronger teal-blue
-  comics: '#E68066',   // Vivid coral
-  toys: '#F2B31A',     // Bright Lego yellow
-  other: '#737A73',    // Darker gray
+  currency: '#F5B400', // Bright gold
+  stamps: '#FF5A46',   // Hot coral
+  cards: '#00C896',    // Electric teal
+  dvds: '#8B5CF6',     // Vivid purple
+  vinyl: '#1E1E23',    // Deep black
+  books: '#3B82F6',    // Bright blue
+  comics: '#F97316',   // Orange flame
+  toys: '#FFC800',     // Lego yellow
+  other: '#64748B',    // Slate gray
 };
 
 // Collection type icons (web equivalents of SF Symbols)
