@@ -33,40 +33,31 @@ export function CollectionTile({ collection, itemCount, onClick }: CollectionTil
           cursor: pointer;
           text-align: center;
           position: relative;
-          overflow: hidden;
-        }
-
-        .collection-tile::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 4px;
-          background: linear-gradient(90deg, ${typeInfo.color}, ${typeInfo.color}99);
-          border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+          border-left: 4px solid ${typeInfo.color};
         }
 
         .tile-icon {
-          width: 64px;
-          height: 64px;
-          border-radius: 16px;
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           margin-bottom: var(--spacing-md);
-          box-shadow: 0 4px 12px ${typeInfo.color}40;
-          transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+          box-shadow:
+            inset 0 2px 4px rgba(0, 0, 0, 0.2),
+            0 2px 4px rgba(89, 60, 31, 0.15);
+          transition: transform var(--transition-fast);
         }
 
         .collection-tile:hover .tile-icon {
-          transform: scale(1.05);
-          box-shadow: 0 6px 16px ${typeInfo.color}50;
+          transform: scale(1.08);
         }
 
         .tile-name {
+          font-family: var(--font-family);
           font-size: 1rem;
-          font-weight: 700;
+          font-weight: 600;
           color: var(--color-text);
           margin-bottom: var(--spacing-xs);
           white-space: nowrap;
@@ -76,16 +67,11 @@ export function CollectionTile({ collection, itemCount, onClick }: CollectionTil
         }
 
         .tile-count {
-          font-size: 0.8rem;
+          font-family: var(--font-family-sans);
+          font-size: 0.75rem;
           font-weight: 500;
           color: var(--color-text-secondary);
-          background: rgba(51, 89, 115, 0.08);
-          padding: 4px 12px;
-          border-radius: 12px;
-        }
-
-        [data-theme="dark"] .tile-count {
-          background: rgba(242, 224, 191, 0.1);
+          font-style: italic;
         }
       `}</style>
     </Card>

@@ -10,9 +10,7 @@ interface StatBubbleProps {
 export function StatBubble({ icon, value, label, color }: StatBubbleProps) {
   return (
     <div className="stat-bubble">
-      <div className="stat-icon-wrapper" style={{ background: `${color}18` }}>
-        <Icon name={icon} size={22} color={color} />
-      </div>
+      <Icon name={icon} size={24} color={color} />
       <span className="stat-value">{value}</span>
       <span className="stat-label">{label}</span>
 
@@ -21,32 +19,33 @@ export function StatBubble({ icon, value, label, color }: StatBubbleProps) {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
           flex: 1;
+          padding: 0 var(--spacing-sm);
+          border-right: 1px solid rgba(89, 60, 31, 0.15);
         }
 
-        .stat-icon-wrapper {
-          width: 44px;
-          height: 44px;
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+        .stat-bubble:last-child {
+          border-right: none;
+        }
+
+        [data-theme="dark"] .stat-bubble {
+          border-right-color: rgba(184, 142, 74, 0.2);
         }
 
         .stat-value {
-          font-size: 1.25rem;
-          font-weight: 800;
+          font-family: var(--font-family);
+          font-size: 1.5rem;
+          font-weight: 700;
           color: var(--color-text);
-          letter-spacing: -0.5px;
         }
 
         .stat-label {
-          font-size: 0.75rem;
-          font-weight: 500;
+          font-family: var(--font-family-sans);
+          font-size: 0.7rem;
           color: var(--color-text-secondary);
           text-transform: uppercase;
-          letter-spacing: 0.5px;
+          letter-spacing: 1px;
         }
       `}</style>
     </div>

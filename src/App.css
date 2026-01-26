@@ -27,30 +27,41 @@ body {
   flex-direction: column;
 }
 
-/* Adaptive background gradient */
+/* Adaptive background - parchment texture feel */
 .adaptive-background {
   min-height: 100vh;
   background:
-    radial-gradient(ellipse at top left, rgba(0, 200, 150, 0.25) 0%, transparent 40%),
-    radial-gradient(ellipse at top right, rgba(255, 90, 70, 0.15) 0%, transparent 40%),
-    radial-gradient(ellipse at bottom left, rgba(139, 92, 246, 0.1) 0%, transparent 40%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(89, 60, 31, 0.015) 2px,
+      rgba(89, 60, 31, 0.015) 4px
+    ),
+    radial-gradient(ellipse at top, rgba(184, 142, 74, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba(168, 103, 50, 0.1) 0%, transparent 40%),
     linear-gradient(
       to bottom,
-      rgb(0, 180, 140) 0%,
-      rgb(80, 210, 175) 10%,
-      var(--color-background) 35%
+      rgb(214, 198, 168) 0%,
+      var(--color-background) 20%
     );
 }
 
 [data-theme="dark"] .adaptive-background {
   background:
-    radial-gradient(ellipse at top left, rgba(0, 200, 150, 0.15) 0%, transparent 40%),
-    radial-gradient(ellipse at top right, rgba(139, 92, 246, 0.12) 0%, transparent 40%),
-    radial-gradient(ellipse at bottom, rgba(255, 90, 70, 0.08) 0%, transparent 40%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(184, 142, 74, 0.03) 2px,
+      rgba(184, 142, 74, 0.03) 4px
+    ),
+    radial-gradient(ellipse at top, rgba(184, 142, 74, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom, rgba(89, 60, 31, 0.15) 0%, transparent 50%),
     linear-gradient(
       to bottom,
-      rgb(20, 35, 45) 0%,
-      var(--color-background) 25%
+      rgb(45, 36, 28) 0%,
+      var(--color-background) 20%
     );
 }
 
@@ -61,29 +72,40 @@ body {
   padding: var(--spacing-md);
 }
 
-/* Card styles */
+/* Card styles - vintage paper feel */
 .card {
   background: var(--color-card);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 4px 16px rgba(51, 89, 115, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  box-shadow:
+    0 1px 0 rgba(184, 142, 74, 0.2),
+    0 4px 12px rgba(89, 60, 31, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(89, 60, 31, 0.15);
   transition: transform var(--transition-normal), box-shadow var(--transition-normal);
-  backdrop-filter: blur(8px);
 }
 
 .card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(51, 89, 115, 0.18), 0 2px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow:
+    0 2px 0 rgba(184, 142, 74, 0.25),
+    0 8px 20px rgba(89, 60, 31, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 [data-theme="dark"] .card {
-  border: 1px solid rgba(242, 224, 191, 0.15);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(184, 142, 74, 0.25);
+  box-shadow:
+    0 1px 0 rgba(184, 142, 74, 0.15),
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 [data-theme="dark"] .card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+  box-shadow:
+    0 2px 0 rgba(184, 142, 74, 0.2),
+    0 8px 24px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 /* Button styles */
@@ -107,14 +129,23 @@ body {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--color-accent), rgb(40, 140, 120));
-  color: white;
-  box-shadow: 0 4px 14px rgba(51, 166, 140, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(to bottom, var(--color-secondary), var(--color-primary));
+  color: rgb(253, 250, 243);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.2) inset,
+    0 2px 4px rgba(89, 60, 31, 0.3);
+  border: 1px solid var(--color-primary);
+  font-family: var(--font-family-sans);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.875rem;
 }
 
 .btn-primary:hover {
-  box-shadow: 0 6px 20px rgba(51, 166, 140, 0.5);
+  background: linear-gradient(to bottom, var(--color-accent), var(--color-secondary));
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.3) inset,
+    0 4px 8px rgba(89, 60, 31, 0.35);
   transform: translateY(-1px);
 }
 
@@ -161,37 +192,38 @@ body {
   border-color: var(--color-accent);
 }
 
-/* Typography */
+/* Typography - vintage feel */
 .title {
+  font-family: var(--font-family);
   font-size: var(--font-title);
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 50%, var(--color-secondary) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.5px;
-  text-shadow: 0 2px 20px rgba(51, 166, 140, 0.2);
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: 1px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 [data-theme="dark"] .title {
-  background: linear-gradient(135deg, var(--color-text) 0%, rgb(255, 214, 128) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-accent);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .heading {
+  font-family: var(--font-family);
   font-size: var(--font-xl);
   font-weight: 700;
   color: var(--color-text);
+  letter-spacing: 0.5px;
 }
 
 .subheading {
+  font-family: var(--font-family-sans);
   font-size: var(--font-md);
   color: var(--color-text-secondary);
+  font-style: italic;
 }
 
 .caption {
+  font-family: var(--font-family-sans);
   font-size: var(--font-sm);
   color: var(--color-text-secondary);
 }

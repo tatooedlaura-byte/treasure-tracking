@@ -16,17 +16,17 @@ function field(
   };
 }
 
-// Collection type colors - VIBRANT & SATURATED
+// Collection type colors - WARM & VINTAGE
 export const COLLECTION_COLORS: Record<CollectionType, string> = {
-  currency: '#F5B400', // Bright gold
-  stamps: '#FF5A46',   // Hot coral
-  cards: '#00C896',    // Electric teal
-  dvds: '#8B5CF6',     // Vivid purple
-  vinyl: '#1E1E23',    // Deep black
-  books: '#3B82F6',    // Bright blue
-  comics: '#F97316',   // Orange flame
-  toys: '#FFC800',     // Lego yellow
-  other: '#64748B',    // Slate gray
+  currency: '#B88E4A', // Antique gold
+  stamps: '#A85248',   // Aged crimson
+  cards: '#567673',    // Patina teal
+  dvds: '#5C4D73',     // Dusty purple
+  vinyl: '#2D2A26',    // Rich black
+  books: '#7A593E',    // Leather brown
+  comics: '#B8763E',   // Burnt sienna
+  toys: '#C69E34',     // Brass yellow
+  other: '#6C6258',    // Warm gray
 };
 
 // Collection type icons (web equivalents of SF Symbols)

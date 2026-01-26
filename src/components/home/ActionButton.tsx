@@ -10,9 +10,7 @@ interface ActionButtonProps {
 export function ActionButton({ icon, title, color, onClick }: ActionButtonProps) {
   return (
     <button className="action-button" onClick={onClick}>
-      <div className="action-icon-wrapper" style={{ background: `${color}15` }}>
-        <Icon name={icon} size={26} color={color} />
-      </div>
+      <Icon name={icon} size={24} color={color} />
       <span className="action-title">{title}</span>
 
       <style>{`
@@ -23,46 +21,43 @@ export function ActionButton({ icon, title, color, onClick }: ActionButtonProps)
           justify-content: center;
           gap: var(--spacing-sm);
           flex: 1;
-          min-height: 90px;
+          min-height: 80px;
           padding: var(--spacing-md);
           background: var(--color-card);
-          border: 1px solid rgba(255, 255, 255, 0.8);
-          border-radius: var(--radius-lg);
+          border: 1px solid rgba(89, 60, 31, 0.15);
+          border-radius: 8px;
           cursor: pointer;
           transition: all var(--transition-fast);
-          box-shadow: 0 2px 8px rgba(51, 89, 115, 0.08);
+          box-shadow:
+            0 2px 4px rgba(89, 60, 31, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.5);
         }
 
         [data-theme="dark"] .action-button {
-          border: 1px solid rgba(242, 224, 191, 0.15);
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+          border: 1px solid rgba(184, 142, 74, 0.25);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         .action-button:hover {
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(51, 89, 115, 0.12);
+          border-color: var(--color-accent);
+          box-shadow: 0 4px 8px rgba(89, 60, 31, 0.15);
         }
 
         .action-button:active {
-          transform: scale(0.97);
-        }
-
-        .action-icon-wrapper {
-          width: 48px;
-          height: 48px;
-          border-radius: 14px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          transform: scale(0.98);
         }
 
         .action-title {
-          font-size: 0.8rem;
+          font-family: var(--font-family-sans);
+          font-size: 0.75rem;
           font-weight: 600;
           color: var(--color-text);
           text-align: center;
           white-space: pre-line;
-          line-height: 1.2;
+          line-height: 1.3;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
         }
       `}</style>
     </button>
