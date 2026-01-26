@@ -14,8 +14,8 @@ export default defineConfig({
         name: 'Treasure Tracking',
         short_name: 'Treasures',
         description: 'Track and organize your collections',
-        theme_color: '#335973',
-        background_color: '#F0EDE6',
+        theme_color: '#00C896',
+        background_color: '#F5F2EB',
         display: 'standalone',
         orientation: 'portrait',
         scope: '/treasure-tracking/',
@@ -40,7 +40,7 @@ export default defineConfig({
         ]
       },
       workbox: {
-        cacheId: 'treasure-tracking-v2',
+        cacheId: 'treasure-tracking-v3',
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
         skipWaiting: true,
         clientsClaim: true,
