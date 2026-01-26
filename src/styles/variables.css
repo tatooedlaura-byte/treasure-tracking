@@ -1,0 +1,100 @@
+/* CSS Custom Properties for Treasure Tracking */
+
+:root {
+  /* Typography - Rounded system font */
+  --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Rounded',
+                 system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  /* Primary colors */
+  --color-primary: rgb(51, 89, 115);
+  --color-secondary: rgb(230, 115, 102);
+  --color-accent: rgb(51, 166, 140);
+
+  /* Light mode backgrounds */
+  --color-background: rgb(240, 237, 230);
+  --color-card: #FFFFFF;
+  --color-text: rgb(51, 89, 115);
+  --color-text-secondary: rgba(51, 89, 115, 0.7);
+
+  /* Icon colors */
+  --color-icon-teal: rgb(51, 166, 140);
+  --color-icon-coral: rgb(230, 115, 102);
+  --color-icon-slate: rgb(51, 89, 115);
+  --color-icon-mint: rgb(102, 191, 166);
+
+  /* Status colors */
+  --color-success: rgb(51, 166, 140);
+  --color-warning: rgb(230, 115, 102);
+  --color-error: rgb(230, 77, 77);
+
+  /* Collection type colors */
+  --color-currency: rgb(217, 166, 51);
+  --color-stamps: rgb(230, 115, 102);
+  --color-cards: rgb(51, 166, 140);
+  --color-dvds: rgb(51, 89, 115);
+  --color-vinyl: rgb(38, 51, 64);
+  --color-books: rgb(77, 140, 166);
+  --color-comics: rgb(230, 128, 102);
+  --color-toys: rgb(242, 179, 26);
+  --color-other: rgb(115, 122, 115);
+
+  /* Condition colors */
+  --color-condition-mint: rgb(255, 214, 0);
+  --color-condition-near-mint: rgb(153, 204, 51);
+  --color-condition-excellent: rgb(77, 191, 102);
+  --color-condition-very-good: rgb(77, 179, 230);
+  --color-condition-good: rgb(128, 128, 230);
+  --color-condition-fair: rgb(242, 153, 51);
+  --color-condition-poor: rgb(230, 77, 77);
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+
+  /* Border radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-card: 0 4px 8px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 0 8px 16px rgba(0, 0, 0, 0.12);
+  --shadow-button: 0 2px 4px rgba(51, 166, 140, 0.4);
+
+  /* Transitions */
+  --transition-fast: 0.15s ease-in-out;
+  --transition-normal: 0.25s ease-in-out;
+
+  /* Font sizes */
+  --font-xs: 0.75rem;
+  --font-sm: 0.875rem;
+  --font-md: 1rem;
+  --font-lg: 1.125rem;
+  --font-xl: 1.25rem;
+  --font-xxl: 1.5rem;
+  --font-title: 2.125rem;
+
+  /* Card border */
+  --card-border: 1px solid rgba(51, 89, 115, 0.1);
+}
+
+/* Dark mode colors */
+[data-theme="dark"] {
+  --color-background: rgb(20, 26, 31);
+  --color-card: rgb(36, 41, 46);
+  --color-text: rgb(242, 224, 191);
+  --color-text-secondary: rgba(242, 224, 191, 0.7);
+
+  /* Shadows removed in dark mode */
+  --shadow-card: none;
+  --shadow-card-hover: none;
+
+  /* Card border in dark mode */
+  --card-border: 1px solid rgba(242, 224, 191, 0.3);
+}
