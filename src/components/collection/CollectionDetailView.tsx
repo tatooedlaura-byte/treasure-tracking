@@ -27,6 +27,8 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
   const [sortBy, setSortBy] = useState<SortOption>('date');
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -92,6 +94,45 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
 
     return result;
   }, [items, searchQuery, sortBy]);
+
+  // Group items by first letter when sorted by name and has enough items
+  const showAlphabetIndex = sortBy === 'name' && filteredItems.length > 10 && !searchQuery;
+
+  const groupedItems = useMemo(() => {
+    if (!showAlphabetIndex) return null;
+
+    const groups: Record<string, CollectionItem[]> = {};
+
+    filteredItems.forEach((item) => {
+      const name = getItemName(item);
+      const firstChar = name.charAt(0).toUpperCase();
+      const letter = /[A-Z]/.test(firstChar) ? firstChar : '#';
+
+      if (!groups[letter]) {
+        groups[letter] = [];
+      }
+      groups[letter].push(item);
+    });
+
+    return groups;
+  }, [filteredItems, showAlphabetIndex]);
+
+  // Get available letters for the index
+  const availableLetters = useMemo(() => {
+    if (!groupedItems) return [];
+    return Object.keys(groupedItems).sort((a, b) => {
+      if (a === '#') return 1;
+      if (b === '#') return -1;
+      return a.localeCompare(b);
+    });
+  }, [groupedItems]);
+
+  const scrollToLetter = (letter: string) => {
+    const section = sectionRefs.current[letter];
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   const handleDeleteCollection = async () => {
     if (confirm(`Delete "${collection.name}" and all its items?`)) {
@@ -243,6 +284,39 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
               </Button>
             )}
           </Card>
+        ) : showAlphabetIndex && groupedItems ? (
+          <div className="items-with-index">
+            <div className="items-list" ref={listRef}>
+              {availableLetters.map((letter) => (
+                <div
+                  key={letter}
+                  ref={(el) => { sectionRefs.current[letter] = el; }}
+                  className="letter-section"
+                >
+                  <div className="letter-header">{letter}</div>
+                  {groupedItems[letter].map((item) => (
+                    <ItemCard
+                      key={item.id}
+                      item={item}
+                      fields={fields}
+                      onClick={() => setSelectedItem(item)}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+            <div className="alphabet-index">
+              {availableLetters.map((letter) => (
+                <button
+                  key={letter}
+                  className="index-letter"
+                  onClick={() => scrollToLetter(letter)}
+                >
+                  {letter}
+                </button>
+              ))}
+            </div>
+          </div>
         ) : (
           <div className="items-list">
             {filteredItems.map((item) => (
@@ -434,6 +508,75 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
           flex-direction: column;
           gap: var(--spacing-sm);
           padding-bottom: 80px;
+        }
+
+        .items-with-index {
+          display: flex;
+          position: relative;
+        }
+
+        .items-with-index .items-list {
+          flex: 1;
+          padding-right: 28px;
+        }
+
+        .letter-section {
+          display: flex;
+          flex-direction: column;
+          gap: var(--spacing-sm);
+        }
+
+        .letter-header {
+          font-size: var(--font-sm);
+          font-weight: 700;
+          color: var(--color-accent);
+          padding: var(--spacing-sm) var(--spacing-xs);
+          position: sticky;
+          top: 0;
+          background: var(--color-background);
+          z-index: 5;
+        }
+
+        .alphabet-index {
+          position: fixed;
+          right: 4px;
+          top: 50%;
+          transform: translateY(-50%);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1px;
+          z-index: 50;
+          background: rgba(255, 255, 255, 0.9);
+          border-radius: 10px;
+          padding: 4px 2px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+          .alphabet-index {
+            background: rgba(30, 36, 41, 0.9);
+          }
+        }
+
+        .index-letter {
+          width: 20px;
+          height: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 10px;
+          font-weight: 600;
+          color: var(--color-accent);
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          padding: 0;
+        }
+
+        .index-letter:active {
+          background: var(--color-accent);
+          color: white;
+          border-radius: 4px;
         }
 
         .fab {
