@@ -503,7 +503,7 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
           background: transparent;
           border: none;
           font-size: var(--font-sm);
-          color: var(--color-accent);
+          color: var(--color-text);
           font-weight: 500;
           cursor: pointer;
         }
@@ -540,7 +540,7 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
         .letter-header {
           font-size: var(--font-sm);
           font-weight: 700;
-          color: var(--color-accent);
+          color: var(--color-text);
           padding: var(--spacing-sm) var(--spacing-xs);
           position: sticky;
           top: 0;
@@ -562,7 +562,7 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
           border-radius: 12px;
           padding: 6px 4px;
           box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
-          border: 2px solid var(--color-accent);
+          border: 2px solid var(--color-primary);
           -webkit-transform: translateY(-50%);
           -webkit-backface-visibility: hidden;
         }
@@ -575,7 +575,7 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
           justify-content: center;
           font-size: 11px;
           font-weight: 700;
-          color: var(--color-accent);
+          color: var(--color-text);
           background: transparent;
           border: none;
           cursor: pointer;
@@ -584,7 +584,7 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
         }
 
         .index-letter:active {
-          background: var(--color-accent);
+          background: var(--color-primary);
           color: white;
           border-radius: 4px;
         }
