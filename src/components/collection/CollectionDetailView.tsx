@@ -560,27 +560,30 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
           flex-direction: column;
           align-items: center;
           gap: 2px;
-          z-index: 999;
+          z-index: 9999;
           background: var(--color-card);
           border-radius: 12px;
           padding: 6px 4px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-          border: 1px solid var(--color-border);
+          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+          border: 2px solid var(--color-accent);
+          -webkit-transform: translateY(-50%);
+          -webkit-backface-visibility: hidden;
         }
 
         .index-letter {
-          width: 20px;
-          height: 16px;
+          width: 22px;
+          height: 18px;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 10px;
-          font-weight: 600;
+          font-size: 11px;
+          font-weight: 700;
           color: var(--color-accent);
           background: transparent;
           border: none;
           cursor: pointer;
           padding: 0;
+          -webkit-tap-highlight-color: transparent;
         }
 
         .index-letter:active {
