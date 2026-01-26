@@ -5,9 +5,10 @@ interface FieldEditorProps {
   field: FieldDefinition;
   value: string;
   onChange: (value: string) => void;
+  onBlur?: () => void;
 }
 
-export function FieldEditor({ field, value, onChange }: FieldEditorProps) {
+export function FieldEditor({ field, value, onChange, onBlur }: FieldEditorProps) {
   const labelId = `field-${field.id}`;
 
   switch (field.type) {
@@ -24,6 +25,7 @@ export function FieldEditor({ field, value, onChange }: FieldEditorProps) {
             className="input"
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            onBlur={onBlur}
             placeholder={`Enter ${field.name.toLowerCase()}`}
           />
         </div>

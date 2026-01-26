@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Button, Card, Icon } from '../common';
 import { FieldEditor } from './FieldEditor';
 import { MovieSearch } from './MovieSearch';
 import { useCollections } from '../../hooks/useCollections';
-import type { MovieSearchResult } from '../../services/movieApi';
+import { searchMovies, getPosterUrl, isTMDBConfigured, type MovieSearchResult } from '../../services/movieApi';
 import type { ItemCollection, FieldDefinition, CollectionItem } from '../../types';
 
 interface AddItemFormProps {
@@ -31,8 +31,11 @@ export function AddItemForm({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showMovieSearch, setShowMovieSearch] = useState(false);
+  const [fetchingPoster, setFetchingPoster] = useState(false);
+  const [posterFetched, setPosterFetched] = useState(false);
 
   const isDVDCollection = collection.type === 'dvds';
+  const tmdbConfigured = isTMDBConfigured();
 
   const handleMovieSelect = async (movie: MovieSearchResult, moviePosterUrl: string | null) => {
     // Fill in fields from movie data
@@ -59,8 +62,58 @@ export function AddItemForm({
     setShowMovieSearch(false);
   };
 
+  // Auto-fetch movie poster when Name field is filled for DVD collections
+  const autoFetchMoviePoster = useCallback(async (movieName: string) => {
+    if (!isDVDCollection || !tmdbConfigured || !movieName.trim() || posterFetched || photoFiles.length > 0) {
+      return;
+    }
+
+    setFetchingPoster(true);
+    try {
+      const results = await searchMovies(movieName);
+      if (results.length > 0) {
+        const movie = results[0];
+        const posterUrl = getPosterUrl(movie.poster_path, 'w500');
+
+        // Auto-fill year if empty
+        if (!fieldValues['Year'] && movie.release_date) {
+          setFieldValues((prev) => ({
+            ...prev,
+            Year: movie.release_date.split('-')[0],
+          }));
+        }
+
+        // Fetch and set poster
+        if (posterUrl) {
+          const response = await fetch(posterUrl);
+          const blob = await response.blob();
+          const file = new File([blob], `${movie.title.replace(/[^a-z0-9]/gi, '_')}_poster.jpg`, {
+            type: 'image/jpeg',
+          });
+          setPhotoFiles([file]);
+          setPosterFetched(true);
+        }
+      }
+    } catch (err) {
+      console.error('Auto-fetch poster failed:', err);
+    } finally {
+      setFetchingPoster(false);
+    }
+  }, [isDVDCollection, tmdbConfigured, posterFetched, photoFiles.length, fieldValues]);
+
   const handleFieldChange = (fieldName: string, value: string) => {
     setFieldValues((prev) => ({ ...prev, [fieldName]: value }));
+
+    // Reset poster fetched state if name changes
+    if (fieldName === 'Name' && isDVDCollection) {
+      setPosterFetched(false);
+    }
+  };
+
+  const handleNameBlur = () => {
+    if (isDVDCollection && fieldValues['Name']) {
+      autoFetchMoviePoster(fieldValues['Name']);
+    }
   };
 
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,7 +192,14 @@ export function AddItemForm({
                 field={field}
                 value={fieldValues[field.name] || ''}
                 onChange={(value) => handleFieldChange(field.name, value)}
+                onBlur={field.name === 'Name' && isDVDCollection ? handleNameBlur : undefined}
               />
+              {field.name === 'Name' && isDVDCollection && fetchingPoster && (
+                <div className="poster-fetching">
+                  <div className="spinner small" />
+                  <span>Finding movie poster...</span>
+                </div>
+              )}
             </Card>
           ))}
 
@@ -326,6 +386,26 @@ export function AddItemForm({
         .movie-search-content p {
           font-size: var(--font-sm);
           color: var(--color-text-secondary);
+        }
+
+        .poster-fetching {
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-sm);
+          margin-top: var(--spacing-sm);
+          padding: var(--spacing-sm);
+          background: rgba(92, 77, 115, 0.1);
+          border-radius: 6px;
+          font-size: var(--font-sm);
+          color: var(--color-dvds);
+        }
+
+        .spinner.small {
+          width: 16px;
+          height: 16px;
+          border-width: 2px;
+          border-color: rgba(92, 77, 115, 0.2);
+          border-top-color: var(--color-dvds);
         }
       `}</style>
     </div>
