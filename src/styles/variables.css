@@ -91,6 +91,20 @@
   --color-text: rgb(244, 237, 221);
   --color-text-secondary: rgba(244, 237, 221, 0.7);
 
+  /* Brighten primary colors for visibility */
+  --color-primary: rgb(180, 140, 90);
+  --color-secondary: rgb(210, 150, 90);
+  --color-accent: rgb(220, 175, 100);
+
+  /* Brighten icon colors */
+  --color-icon-teal: rgb(120, 180, 160);
+  --color-icon-coral: rgb(220, 140, 120);
+  --color-icon-slate: rgb(180, 140, 90);
+  --color-icon-mint: rgb(150, 200, 175);
+
+  /* Status colors - brighter for dark mode */
+  --color-success: rgb(120, 180, 125);
+
   /* Shadows in dark mode */
   --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.5);
   --shadow-card-hover: 0 8px 30px rgba(0, 0, 0, 0.6);
