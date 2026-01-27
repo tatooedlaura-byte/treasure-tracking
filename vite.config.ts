@@ -40,11 +40,13 @@ export default defineConfig({
         ]
       },
       workbox: {
-        cacheId: 'treasure-tracking-v4',
+        cacheId: 'treasure-tracking-v5',
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
+        // Force network-first for app shell to always get latest
+        navigateFallback: null,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/www\.googleapis\.com\/.*/i,
