@@ -2,6 +2,24 @@ import { Card, Icon, ConditionBadge, AuthenticatedImage } from '../common';
 import { getItemName, getItemEstimatedValue, getItemCondition } from '../../types';
 import type { CollectionItem, FieldDefinition } from '../../types';
 
+// Words that should stay lowercase unless first word
+const LOWERCASE_WORDS = ['a', 'an', 'the', 'and', 'but', 'or', 'for', 'nor', 'on', 'at', 'to', 'by', 'of', 'in'];
+
+function toTitleCase(str: string): string {
+  return str
+    .split(' ')
+    .map((word, index) => {
+      if (word.length === 0) return word;
+      const lower = word.toLowerCase();
+      // Always capitalize first word, otherwise check if it's a lowercase word
+      if (index === 0 || !LOWERCASE_WORDS.includes(lower)) {
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      }
+      return lower;
+    })
+    .join(' ');
+}
+
 interface ItemCardProps {
   item: CollectionItem;
   fields: FieldDefinition[];
@@ -9,7 +27,7 @@ interface ItemCardProps {
 }
 
 export function ItemCard({ item, fields, onClick }: ItemCardProps) {
-  const name = getItemName(item);
+  const name = toTitleCase(getItemName(item));
   const value = getItemEstimatedValue(item);
   const condition = getItemCondition(item);
   const hasPhotos = item.photos.length > 0;

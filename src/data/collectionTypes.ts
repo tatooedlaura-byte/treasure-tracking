@@ -16,17 +16,17 @@ function field(
   };
 }
 
-// Collection type colors - WARM & VINTAGE
+// Collection type colors - WARM & VINTAGE (brightened for dark mode visibility)
 export const COLLECTION_COLORS: Record<CollectionType, string> = {
-  currency: '#B88E4A', // Antique gold
-  stamps: '#A85248',   // Aged crimson
-  cards: '#567673',    // Patina teal
-  dvds: '#5C4D73',     // Dusty purple
-  vinyl: '#2D2A26',    // Rich black
-  books: '#7A593E',    // Leather brown
-  comics: '#B8763E',   // Burnt sienna
-  toys: '#C69E34',     // Brass yellow
-  other: '#6C6258',    // Warm gray
+  currency: '#D4A84E', // Antique gold (brighter)
+  stamps: '#C45F52',   // Aged crimson (brighter)
+  cards: '#6B9996',    // Patina teal (brighter)
+  dvds: '#8B7AA8',     // Dusty purple (brighter)
+  vinyl: '#8C8680',    // Warm gray (was too dark)
+  books: '#9A7350',    // Leather brown (brighter)
+  comics: '#D4894A',   // Burnt sienna (brighter)
+  toys: '#DBAF3D',     // Brass yellow (brighter)
+  other: '#8A7D70',    // Warm gray (brighter)
 };
 
 // Collection type icons (web equivalents of SF Symbols)

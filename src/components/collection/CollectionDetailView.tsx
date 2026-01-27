@@ -18,6 +18,15 @@ interface CollectionDetailViewProps {
 
 type SortOption = 'name' | 'date' | 'condition' | 'value';
 
+// Helper to strip leading articles for sorting
+function getSortableName(name: string): string {
+  const lower = name.toLowerCase();
+  if (lower.startsWith('the ')) return name.slice(4);
+  if (lower.startsWith('a ')) return name.slice(2);
+  if (lower.startsWith('an ')) return name.slice(3);
+  return name;
+}
+
 export function CollectionDetailView({ collection, onBack, onHome }: CollectionDetailViewProps) {
   const { getItemsForCollection, deleteCollection, collectionValue, updateItem } = useCollections();
 
@@ -88,7 +97,7 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
     result = [...result].sort((a, b) => {
       switch (sortBy) {
         case 'name':
-          return getItemName(a).localeCompare(getItemName(b));
+          return getSortableName(getItemName(a)).localeCompare(getSortableName(getItemName(b)));
         case 'date':
           return new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime();
         case 'condition': {
@@ -121,7 +130,7 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
     const groups: Record<string, CollectionItem[]> = {};
 
     filteredItems.forEach((item) => {
-      const name = getItemName(item);
+      const name = getSortableName(getItemName(item));
       const firstChar = name.charAt(0).toUpperCase();
       const letter = /[A-Z]/.test(firstChar) ? firstChar : '#';
 

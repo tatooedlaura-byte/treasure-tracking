@@ -219,6 +219,9 @@ export function ItemDetailView({
           .fullscreen-img {
             flex: 1;
             object-fit: contain;
+            max-width: 90vw;
+            max-height: 70vh;
+            margin: auto;
           }
 
           .photo-nav {
