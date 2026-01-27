@@ -220,7 +220,9 @@ export function HomeView() {
         .app-icon-wrapper {
           margin-bottom: var(--spacing-lg);
           position: relative;
-          display: inline-block;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .app-icon-wrapper::before {
@@ -242,6 +244,7 @@ export function HomeView() {
         }
 
         .app-icon {
+          display: block;
           width: 90px;
           height: 90px;
           border-radius: 16px;
