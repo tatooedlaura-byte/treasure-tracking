@@ -162,7 +162,7 @@ export function CSVImportView({ onClose }: CSVImportViewProps) {
         {/* Header */}
         <header className="csv-header">
           <button className="back-btn" onClick={onClose}>
-            <Icon name="chevron-left" size={24} />
+            <Icon name="chevron-left" size={32} />
           </button>
           <h1 className="heading">Import CSV</h1>
           <div style={{ width: 40 }} />
@@ -337,9 +337,14 @@ export function CSVImportView({ onClose }: CSVImportViewProps) {
         .back-btn {
           background: transparent;
           border: none;
-          padding: var(--spacing-sm);
+          padding: var(--spacing-md);
           cursor: pointer;
           color: var(--color-text);
+          min-width: 44px;
+          min-height: 44px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .csv-section {

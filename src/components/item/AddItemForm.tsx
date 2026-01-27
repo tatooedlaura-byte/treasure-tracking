@@ -162,7 +162,7 @@ export function AddItemForm({
         {/* Header */}
         <header className="form-header">
           <button className="back-btn" onClick={onClose}>
-            <Icon name="x" size={24} />
+            <Icon name="x" size={28} />
           </button>
           <h1 className="heading">{isEditing ? 'Edit Item' : 'Add Item'}</h1>
           <div style={{ width: 40 }} />
@@ -278,9 +278,14 @@ export function AddItemForm({
         .back-btn {
           background: transparent;
           border: none;
-          padding: var(--spacing-sm);
+          padding: var(--spacing-md);
           cursor: pointer;
           color: var(--color-text);
+          min-width: 44px;
+          min-height: 44px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .form-section {

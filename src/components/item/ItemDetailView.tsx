@@ -244,7 +244,7 @@ export function ItemDetailView({
         {/* Header */}
         <header className="detail-header">
           <button className="back-btn" onClick={onBack}>
-            <Icon name="chevron-left" size={24} />
+            <Icon name="chevron-left" size={32} />
           </button>
           <h1 className="heading" style={{ flex: 1, textAlign: 'center' }}>
             {name}
@@ -369,7 +369,20 @@ export function ItemDetailView({
           position: relative;
         }
 
-        .back-btn, .header-btn {
+        .back-btn {
+          background: transparent;
+          border: none;
+          padding: var(--spacing-md);
+          cursor: pointer;
+          color: var(--color-text);
+          min-width: 44px;
+          min-height: 44px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .header-btn {
           background: transparent;
           border: none;
           padding: var(--spacing-sm);

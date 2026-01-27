@@ -255,11 +255,11 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
           <div className="header-left">
             {onHome && (
               <button className="home-btn" onClick={onHome}>
-                <Icon name="home" size={22} />
+                <Icon name="home" size={28} />
               </button>
             )}
             <button className="back-btn" onClick={onBack}>
-              <Icon name="chevron-left" size={24} />
+              <Icon name="chevron-left" size={32} />
             </button>
           </div>
           <h1 className="heading">{collection.name}</h1>
@@ -460,12 +460,30 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
         .home-btn {
           background: transparent;
           border: none;
-          padding: var(--spacing-sm);
+          padding: var(--spacing-md);
           cursor: pointer;
           color: var(--color-accent);
+          min-width: 44px;
+          min-height: 44px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
-        .back-btn, .header-btn {
+        .back-btn {
+          background: transparent;
+          border: none;
+          padding: var(--spacing-md);
+          cursor: pointer;
+          color: var(--color-text);
+          min-width: 44px;
+          min-height: 44px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .header-btn {
           background: transparent;
           border: none;
           padding: var(--spacing-sm);
