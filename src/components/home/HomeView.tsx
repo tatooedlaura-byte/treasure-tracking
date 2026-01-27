@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, Icon, Button } from '../common';
+import { Card, Icon, PullToRefresh, EmptyState } from '../common';
 import { StatBubble } from './StatBubble';
 import { CollectionTile } from './CollectionTile';
 import { ActionButton } from './ActionButton';
@@ -21,6 +21,7 @@ export function HomeView() {
     totalItems,
     totalEstimatedValue,
     itemCount,
+    refresh,
   } = useCollections();
 
   const [showAddCollection, setShowAddCollection] = useState(false);
@@ -81,6 +82,7 @@ export function HomeView() {
   }
 
   return (
+    <PullToRefresh onRefresh={refresh}>
     <div className="adaptive-background">
       <div className="container">
         {/* Header */}
@@ -136,15 +138,13 @@ export function HomeView() {
           <h2 className="heading">My Collections</h2>
 
           {collections.length === 0 ? (
-            <Card className="empty-state">
-              <Icon name="archive" size={50} className="empty-state-icon" />
-              <h3>No collections yet</h3>
-              <p className="caption">Start by creating your first collection</p>
-              <Button onClick={() => setShowAddCollection(true)}>
-                <Icon name="plus-circle" size={20} />
-                Create Collection
-              </Button>
-            </Card>
+            <EmptyState
+              type="collections"
+              title="No collections yet"
+              description="Start by creating your first collection to track your treasures"
+              actionLabel="Create Collection"
+              onAction={() => setShowAddCollection(true)}
+            />
           ) : (
             <div className="grid-2">
               {collections.map((collection) => (
@@ -305,5 +305,6 @@ export function HomeView() {
         }
       `}</style>
     </div>
+    </PullToRefresh>
   );
 }

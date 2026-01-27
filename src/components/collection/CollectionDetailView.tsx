@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { Card, Icon, Button } from '../common';
+import { Card, Icon, SwipeableItem, PullToRefresh, EmptyState } from '../common';
 import { ItemCard } from './ItemCard';
 import { AddItemForm } from '../item/AddItemForm';
 import { ItemDetailView } from '../item/ItemDetailView';
@@ -28,7 +28,7 @@ function getSortableName(name: string): string {
 }
 
 export function CollectionDetailView({ collection, onBack, onHome }: CollectionDetailViewProps) {
-  const { getItemsForCollection, deleteCollection, collectionValue, updateItem } = useCollections();
+  const { getItemsForCollection, deleteCollection, deleteItem, collectionValue, updateItem, refresh } = useCollections();
 
   const [showAddItem, setShowAddItem] = useState(false);
   const [showEditCollection, setShowEditCollection] = useState(false);
@@ -257,6 +257,7 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
   }
 
   return (
+    <PullToRefresh onRefresh={refresh}>
     <div className="adaptive-background">
       <div className="container">
         {/* Header */}
@@ -382,21 +383,21 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
 
         {/* Items List */}
         {filteredItems.length === 0 ? (
-          <Card className="empty-state">
-            <Icon name="archive" size={50} className="empty-state-icon" />
-            <h3>{items.length === 0 ? 'No items yet' : 'No matching items'}</h3>
-            <p className="caption">
-              {items.length === 0
-                ? 'Add your first item to this collection'
-                : 'Try a different search term'}
-            </p>
-            {items.length === 0 && (
-              <Button onClick={() => setShowAddItem(true)}>
-                <Icon name="plus" size={20} />
-                Add Item
-              </Button>
-            )}
-          </Card>
+          items.length === 0 ? (
+            <EmptyState
+              type="items"
+              title="No items yet"
+              description="Add your first item to start building this collection"
+              actionLabel="Add Item"
+              onAction={() => setShowAddItem(true)}
+            />
+          ) : (
+            <EmptyState
+              type="search"
+              title="No matching items"
+              description="Try a different search term or adjust your filters"
+            />
+          )
         ) : showAlphabetIndex && groupedItems ? (
           <div className="items-with-index">
             <div className="items-list" ref={listRef}>
@@ -408,12 +409,13 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
                 >
                   <div className="letter-header">{letter}</div>
                   {groupedItems[letter].map((item) => (
-                    <ItemCard
-                      key={item.id}
-                      item={item}
-                      fields={fields}
-                      onClick={() => handleSelectItem(item)}
-                    />
+                    <SwipeableItem key={item.id} onDelete={() => deleteItem(item.id)}>
+                      <ItemCard
+                        item={item}
+                        fields={fields}
+                        onClick={() => handleSelectItem(item)}
+                      />
+                    </SwipeableItem>
                   ))}
                 </div>
               ))}
@@ -433,12 +435,13 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
         ) : (
           <div className="items-list">
             {filteredItems.map((item) => (
-              <ItemCard
-                key={item.id}
-                item={item}
-                fields={fields}
-                onClick={() => handleSelectItem(item)}
-              />
+              <SwipeableItem key={item.id} onDelete={() => deleteItem(item.id)}>
+                <ItemCard
+                  item={item}
+                  fields={fields}
+                  onClick={() => handleSelectItem(item)}
+                />
+              </SwipeableItem>
             ))}
           </div>
         )}
@@ -833,5 +836,6 @@ export function CollectionDetailView({ collection, onBack, onHome }: CollectionD
         }
       `}</style>
     </div>
+    </PullToRefresh>
   );
 }
