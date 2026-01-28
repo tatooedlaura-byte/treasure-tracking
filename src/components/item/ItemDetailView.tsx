@@ -2,9 +2,11 @@ import { useState, useRef } from 'react';
 import { Card, Icon, ConditionBadge, AuthenticatedImage } from '../common';
 import { AddItemForm } from './AddItemForm';
 import { MovieSearch } from './MovieSearch';
+import { LegoSearch } from './LegoSearch';
 import { useCollections } from '../../hooks/useCollections';
 import { getItemName, getItemCondition } from '../../types';
 import { isTMDBConfigured, type MovieSearchResult } from '../../services/movieApi';
+import { isRebrickableConfigured, type LegoSetSearchResult } from '../../services/rebrickableApi';
 import { Share } from '@capacitor/share';
 import type { ItemCollection, CollectionItem, FieldDefinition } from '../../types';
 
@@ -31,13 +33,16 @@ export function ItemDetailView({
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
   const [showFullScreenPhoto, setShowFullScreenPhoto] = useState(false);
   const [showMovieSearch, setShowMovieSearch] = useState(false);
+  const [showLegoSearch, setShowLegoSearch] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const name = getItemName(item);
   const condition = getItemCondition(item);
   const isDVDCollection = collection.type === 'dvds';
+  const isToysCollection = collection.type === 'toys';
   const tmdbConfigured = isTMDBConfigured();
+  const rebrickableConfigured = isRebrickableConfigured();
 
   const handleDelete = async () => {
     if (confirm(`Delete "${name}"?`)) {
@@ -118,6 +123,29 @@ export function ItemDetailView({
       await addPhotosToItem(item.id, [file]);
     } catch (err) {
       console.error('Failed to fetch poster:', err);
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
+  const handleLegoSelect = async (set: LegoSetSearchResult, _themeName: string) => {
+    if (!set.set_img_url) {
+      setShowLegoSearch(false);
+      return;
+    }
+
+    setShowLegoSearch(false);
+    setUploadingPhoto(true);
+
+    try {
+      const response = await fetch(set.set_img_url);
+      const blob = await response.blob();
+      const file = new File([blob], `${set.set_num}_${set.name.replace(/[^a-z0-9]/gi, '_')}.jpg`, {
+        type: 'image/jpeg',
+      });
+      await addPhotosToItem(item.id, [file]);
+    } catch (err) {
+      console.error('Failed to fetch Lego set image:', err);
     } finally {
       setUploadingPhoto(false);
     }
@@ -284,6 +312,14 @@ export function ItemDetailView({
           />
         )}
 
+        {/* Lego Search Modal */}
+        {showLegoSearch && (
+          <LegoSearch
+            onSelect={handleLegoSelect}
+            onClose={() => setShowLegoSearch(false)}
+          />
+        )}
+
         {/* Photos */}
         {item.photos.length > 0 && (
           <div className="photo-carousel">
@@ -319,6 +355,16 @@ export function ItemDetailView({
             >
               <Icon name="search" size={20} />
               Search Movie Poster
+            </button>
+          )}
+          {isToysCollection && rebrickableConfigured && (
+            <button
+              className="photo-action-btn"
+              onClick={() => setShowLegoSearch(true)}
+              disabled={uploadingPhoto}
+            >
+              <Icon name="puzzle" size={20} />
+              Search Lego Set
             </button>
           )}
           <label className="photo-action-btn">

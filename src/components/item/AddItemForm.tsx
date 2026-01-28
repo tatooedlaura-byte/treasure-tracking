@@ -2,8 +2,10 @@ import { useState, useCallback } from 'react';
 import { Button, Card, Icon, AuthenticatedImage } from '../common';
 import { FieldEditor } from './FieldEditor';
 import { MovieSearch } from './MovieSearch';
+import { LegoSearch } from './LegoSearch';
 import { useCollections } from '../../hooks/useCollections';
 import { searchMovies, getPosterUrl, isTMDBConfigured, type MovieSearchResult } from '../../services/movieApi';
+import { isRebrickableConfigured, type LegoSetSearchResult } from '../../services/rebrickableApi';
 import type { ItemCollection, FieldDefinition, CollectionItem } from '../../types';
 
 interface AddItemFormProps {
@@ -31,11 +33,14 @@ export function AddItemForm({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showMovieSearch, setShowMovieSearch] = useState(false);
+  const [showLegoSearch, setShowLegoSearch] = useState(false);
   const [fetchingPoster, setFetchingPoster] = useState(false);
   const [posterFetched, setPosterFetched] = useState(false);
 
   const isDVDCollection = collection.type === 'dvds';
+  const isToysCollection = collection.type === 'toys';
   const tmdbConfigured = isTMDBConfigured();
+  const rebrickableConfigured = isRebrickableConfigured();
 
   const handleMovieSelect = async (movie: MovieSearchResult, moviePosterUrl: string | null) => {
     // Fill in fields from movie data
@@ -60,6 +65,35 @@ export function AddItemForm({
     }
 
     setShowMovieSearch(false);
+  };
+
+  const handleLegoSelect = async (set: LegoSetSearchResult, themeName: string) => {
+    // Fill in fields from Lego set data
+    setFieldValues((prev) => ({
+      ...prev,
+      Name: set.name,
+      'Set Number': set.set_num,
+      Theme: themeName,
+      Pieces: set.num_parts.toString(),
+      Year: set.year.toString(),
+      Brand: 'Lego',
+    }));
+
+    // Fetch the set image and convert to file for upload
+    if (set.set_img_url) {
+      try {
+        const response = await fetch(set.set_img_url);
+        const blob = await response.blob();
+        const file = new File([blob], `${set.set_num}_${set.name.replace(/[^a-z0-9]/gi, '_')}.jpg`, {
+          type: 'image/jpeg',
+        });
+        setPhotoFiles([file]);
+      } catch (err) {
+        console.error('Failed to fetch Lego set image:', err);
+      }
+    }
+
+    setShowLegoSearch(false);
   };
 
   // Auto-fetch movie poster when Name field is filled for DVD collections
@@ -182,11 +216,33 @@ export function AddItemForm({
           </Card>
         )}
 
+        {/* Lego Search Button for Toys */}
+        {isToysCollection && !isEditing && (
+          <Card className="lego-search-card" onClick={() => setShowLegoSearch(true)}>
+            <div className="lego-search-content">
+              <Icon name="puzzle" size={24} color="var(--color-toys)" />
+              <div>
+                <h3>Search Lego Database</h3>
+                <p>Find set images and auto-fill details</p>
+              </div>
+            </div>
+            <Icon name="chevron-right" size={20} color="var(--color-text-secondary)" />
+          </Card>
+        )}
+
         {/* Movie Search Modal */}
         {showMovieSearch && (
           <MovieSearch
             onSelect={handleMovieSelect}
             onClose={() => setShowMovieSearch(false)}
+          />
+        )}
+
+        {/* Lego Search Modal */}
+        {showLegoSearch && (
+          <LegoSearch
+            onSelect={handleLegoSelect}
+            onClose={() => setShowLegoSearch(false)}
           />
         )}
 
@@ -397,6 +453,40 @@ export function AddItemForm({
         }
 
         .movie-search-content p {
+          font-size: var(--font-sm);
+          color: var(--color-text-secondary);
+        }
+
+        .lego-search-card {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: var(--spacing-lg);
+          margin-bottom: var(--spacing-md);
+          cursor: pointer;
+          background: linear-gradient(135deg, rgba(219, 175, 61, 0.1), rgba(219, 175, 61, 0.05));
+          border: 2px solid rgba(219, 175, 61, 0.3);
+        }
+
+        .lego-search-card:hover {
+          border-color: rgba(219, 175, 61, 0.5);
+          background: linear-gradient(135deg, rgba(219, 175, 61, 0.15), rgba(219, 175, 61, 0.08));
+        }
+
+        .lego-search-content {
+          display: flex;
+          align-items: center;
+          gap: var(--spacing-md);
+        }
+
+        .lego-search-content h3 {
+          font-size: var(--font-md);
+          font-weight: 600;
+          color: var(--color-text);
+          margin-bottom: 2px;
+        }
+
+        .lego-search-content p {
           font-size: var(--font-sm);
           color: var(--color-text-secondary);
         }
