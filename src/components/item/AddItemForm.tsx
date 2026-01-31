@@ -5,7 +5,8 @@ import { MovieSearch } from './MovieSearch';
 import { LegoSearch } from './LegoSearch';
 import { useCollections } from '../../hooks/useCollections';
 import { searchMovies, getPosterUrl, isTMDBConfigured, type MovieSearchResult } from '../../services/movieApi';
-import { isRebrickableConfigured, type LegoSetSearchResult } from '../../services/rebrickableApi';
+import { type LegoSetSearchResult } from '../../services/rebrickableApi';
+import { takePhoto } from '../../utils/camera';
 import type { ItemCollection, FieldDefinition, CollectionItem } from '../../types';
 
 interface AddItemFormProps {
@@ -40,7 +41,6 @@ export function AddItemForm({
   const isDVDCollection = collection.type === 'dvds';
   const isToysCollection = collection.type === 'toys';
   const tmdbConfigured = isTMDBConfigured();
-  const rebrickableConfigured = isRebrickableConfigured();
 
   const handleMovieSelect = async (movie: MovieSearchResult, moviePosterUrl: string | null) => {
     // Fill in fields from movie data
@@ -300,17 +300,34 @@ export function AddItemForm({
               </div>
             )}
 
-            <label className="add-photo-btn">
-              <Icon name="camera" size={20} />
-              Add Photos
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handlePhotoSelect}
-                style={{ display: 'none' }}
-              />
-            </label>
+            <div className="photo-btn-row">
+              <button
+                type="button"
+                className="add-photo-btn"
+                onClick={async () => {
+                  try {
+                    const file = await takePhoto();
+                    setPhotoFiles((prev) => [...prev, file]);
+                  } catch {
+                    // User cancelled
+                  }
+                }}
+              >
+                <Icon name="camera" size={20} />
+                Take Photo
+              </button>
+              <label className="add-photo-btn">
+                <Icon name="image" size={20} />
+                Add Photos
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handlePhotoSelect}
+                  style={{ display: 'none' }}
+                />
+              </label>
+            </div>
           </Card>
 
           {/* Error */}
@@ -393,7 +410,13 @@ export function AddItemForm({
           justify-content: center;
         }
 
+        .photo-btn-row {
+          display: flex;
+          gap: var(--spacing-sm);
+        }
+
         .add-photo-btn {
+          flex: 1;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -404,6 +427,8 @@ export function AddItemForm({
           color: var(--color-text-secondary);
           cursor: pointer;
           transition: all var(--transition-fast);
+          background: transparent;
+          font: inherit;
         }
 
         .add-photo-btn:hover {

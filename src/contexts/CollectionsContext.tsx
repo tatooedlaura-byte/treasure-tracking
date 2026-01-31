@@ -11,6 +11,7 @@ import type {
   AppData,
 } from '../types';
 import { getItemEstimatedValue } from '../types';
+import { backupPhotoToLibrary } from '../utils/photoBackup';
 
 interface CollectionsContextValue {
   // Data
@@ -203,6 +204,7 @@ export function CollectionsProvider({ children }: { children: ReactNode }) {
         for (const file of photoFiles) {
           const photo = await storage.uploadPhoto(file);
           photos.push(photo);
+          backupPhotoToLibrary(file);
         }
       }
 
@@ -233,6 +235,7 @@ export function CollectionsProvider({ children }: { children: ReactNode }) {
         for (const file of newPhotoFiles) {
           const photo = await storage.uploadPhoto(file);
           newPhotos.push(photo);
+          backupPhotoToLibrary(file);
         }
         updatedItem = { ...updatedItem, photos: [...item.photos, ...newPhotos] };
       }
@@ -273,6 +276,7 @@ export function CollectionsProvider({ children }: { children: ReactNode }) {
       for (const file of files) {
         const photo = await storage.uploadPhoto(file);
         newPhotos.push(photo);
+        backupPhotoToLibrary(file);
       }
 
       const updatedItem: CollectionItem = {

@@ -8,6 +8,7 @@ import { getItemName, getItemCondition } from '../../types';
 import { isTMDBConfigured, type MovieSearchResult } from '../../services/movieApi';
 import { isRebrickableConfigured, type LegoSetSearchResult } from '../../services/rebrickableApi';
 import { Share } from '@capacitor/share';
+import { takePhoto } from '../../utils/camera';
 import type { ItemCollection, CollectionItem, FieldDefinition } from '../../types';
 
 interface ItemDetailViewProps {
@@ -367,8 +368,26 @@ export function ItemDetailView({
               Search Lego Set
             </button>
           )}
-          <label className="photo-action-btn">
+          <button
+            className="photo-action-btn"
+            onClick={async () => {
+              try {
+                const file = await takePhoto();
+                setUploadingPhoto(true);
+                await addPhotosToItem(item.id, [file]);
+              } catch {
+                // User cancelled
+              } finally {
+                setUploadingPhoto(false);
+              }
+            }}
+            disabled={uploadingPhoto}
+          >
             <Icon name="camera" size={20} />
+            Take Photo
+          </button>
+          <label className="photo-action-btn">
+            <Icon name="image" size={20} />
             {uploadingPhoto ? 'Uploading...' : 'Add Photo'}
             <input
               ref={fileInputRef}
