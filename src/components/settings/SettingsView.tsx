@@ -84,7 +84,7 @@ export function SettingsView({ onClose }: SettingsViewProps) {
           <h2 className="section-title">About</h2>
           <div className="about-row">
             <span>Version</span>
-            <span className="about-value">1.0.0</span>
+            <span className="about-value">1.1.0</span>
           </div>
           <div className="about-row">
             <span>App</span>

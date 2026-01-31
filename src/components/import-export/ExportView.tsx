@@ -22,7 +22,7 @@ export function ExportView({ onClose, onCSVImport }: ExportViewProps) {
 
       const exportData: ExportData = {
         exportDate: new Date().toISOString(),
-        version: '1.0.0',
+        version: '1.1.0',
         collections: data.collections,
         items: data.items,
       };
